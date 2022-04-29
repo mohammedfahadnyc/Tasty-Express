@@ -8,3 +8,6 @@ Initial Commit - First Draft Front End,complete CSS HTML files uploaded. For Fro
  
  
  Bakcend - As of now, we're planning to use flask, so get started with flask, make sure to move all the html files to a templates folder and css/js(ie all other files) to a static folder. Start your flask server and set the home route to "home.html".
+ 
+ 
+ Commit 1 - Ignore the themes folder. User Sign up and login functionality added
