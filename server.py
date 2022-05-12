@@ -50,6 +50,9 @@ def index():
         top_5 = restaurant.query.order_by(desc(restaurant.rating)).limit(5).all()
         return render_template("home.html", restaurants=top_5)
 
+@app.route("/restaurant.html")
+def menu():
+    return render_template("restaurant.html")
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
