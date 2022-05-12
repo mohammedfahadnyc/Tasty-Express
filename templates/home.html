@@ -28,37 +28,45 @@
 
 <body class="fixed-bottom-bar">
    <header class="section-header">
-        <section class="header-main shadow-sm bg-primary-style2 py-2">
-            <div class="container">
-                <div class="row align-items-center">
-                    <div class="col-1">
-                        <a href="/" class="brand-wrap">
-                            <img alt="#" class="img-fluid" src="static/img/logo_web.png">
-                        </a>
-                    </div>
-                    <!-- col.// -->
-                    <div class="col-11">
-                        <div class="d-flex align-items-center justify-content-end">
-                            <!-- search -->
-                            <!-- <a href="search.html" class="widget-header mr-4 text-white">
-                                <div class="icon d-flex align-items-center">
-                                    <i class="feather-search h6 mr-2 mb-0"></i> <span>Search</span>
-                                </div>
-                            </a> -->
-                            <!-- signin -->
-                            <a href="login" class="widget-header font-weight-bold mr-5 text-white m-none">Sign in</a>
-                            <!-- signup -->
-                            <a href="signup" class="widget-header font-weight-bold mr-3 text-white m-none">Sign Up</a>
-                        </div>
-                        <!-- widgets-wrap.// -->
-                    </div>
-                    <!-- col.// -->
-                </div>
-                <!-- row.// -->
-            </div>
-            <!-- container.// -->
-        </section>
-        <!-- header-main .// -->
+     <section class="header-main shadow-sm bg-primary-style2 py-2" style="height:65px">
+         <div class="container">
+             <div class="row align-items-center pt-1">
+                 <div class="col-1">
+                     <a href="/" class="brand-wrap">
+                         <img alt="#" class="img-fluid" src="static/img/logo_web.png">
+                     </a>
+                 </div>
+                 <!-- col.// -->
+                 <div class="col">
+                     <div class="d-flex align-items-center justify-content-end">
+                         <!-- search -->
+                         <!-- <div class="container">
+                           <form action="#" method="get">
+                             <div class="search input-group align-items-center justify-content-center py-1">
+                                 <input class="form-control col-md-8" type="text" name="search_val" value="{{ request.args['search_val'] }}"
+                                 style="border-radius:20px;height:40px;font-size:14px" placeholder="Search">
+                               <div class="input-group-prepend pl-3">
+                                 <button class="btn " style="background-color: white;border-radius:20px;height:40px;width:70px;font-size:14px">
+                                   <i class="feather-search h5"></i>
+                                 </button>
+                               </div>
+                             </div>
+                           </form>
+                         </div> -->
+                         <!-- signin -->
+                         <a href="login" class="widget-header font-weight-bold mr-3 text-white m-none" style="width:70px;font-size:14px">Sign In</a>
+                         <!-- signup -->
+                         <a href="signup" class="widget-header font-weight-bold mr-3 text-white m-none"style="width:70px;font-size:14px">Sign Up</a>
+                     </div>
+                     <!-- widgets-wrap.// -->
+                 </div>
+                 <!-- col.// -->
+             </div>
+             <!-- row.// -->
+         </div>
+         <!-- container.// -->
+     </section>
+     <!-- header-main .// -->
     </header>
 
     <div class="fahad-home-page">
@@ -88,9 +96,10 @@
             <div class="container">
               <form action="#" method="get">
                 <div class="search input-group align-items-center justify-content-center" style="padding-top:75px;">
-                    <input class="form-control col-md-7" type="text" name="search_val" value="{{ request.args['search_val'] }}" style="border-radius:7px;height:47px;font-size:16px" placeholder="Search">
+                    <input class="form-control col-md-7" type="text" name="search_val" value="{{ request.args['search_val'] }}"
+                    style="border-radius:25px;height:47px;font-size:16px;padding-left:25px" placeholder="Search">
                   <div class="input-group-prepend pl-2">
-                    <button class="btn btn-primary" style="border-radius:10px;height:50px;width:70px;font-size:16px">
+                    <button class="btn btn-primary" style="border-radius:25px;height:50px;width:70px;font-size:16px">
                       <i class="feather-search h5"></i>
                     </button>
                   </div>
@@ -118,6 +127,10 @@
                       <div class="p-3 position-relative">
                           <div class="list-card-body">
                               <h6 class="mb-1"><a href="restaurant.html" class="text-black">{{ restaurant['name'] }}</a>
+                          </div>
+                          <div class="list-card-body">
+                                <h6 class="mb-1"><a href="restaurant.html" class="text-gray font-weight-light">Sub-Heading</a></h6>
+                                <p class="text-gray mb-3">Category1 • Category2 • Category3</p>
                           </div>
                       </div>
                   </div>
