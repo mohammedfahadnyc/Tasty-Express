@@ -17,7 +17,14 @@ class user(db.Model):
 
 @app.route("/")
 def index():
-    return render_template("home.html")
+    # top 10 restraunts based on rating
+    search_val = request.args.get("search_val")
+    restaurants = ({"name": f"Restaurant {str(num)}", "rating": f"{str(num % 5)}.5"} for num in range(1, 11))
+
+    if search_val:
+        return render_template("search.html")
+
+    return render_template("home.html", restaurants=restaurants)
 
 
 @app.route("/login", methods=["GET", "POST"])
