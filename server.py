@@ -1,4 +1,4 @@
-from flask import Flask, render_template, flash, redirect, url_for, session, logging, request
+from flask import Flask, render_template, flash, redirect, url_for, session, logging, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import desc
 
@@ -31,6 +31,11 @@ class menu(db.Model):
     category = db.Column(db.String(80))
     db.CheckConstraint('category in ("food", "drink", "dessert")', name='category_check')
 
+@app.before_first_request
+def initialize():
+    session['account_type'] = "visitor"
+    # session['cart'] = {}
+    # session['total'] = 0
 
 def search(search_val):
     # currently just using a simple like filter
@@ -53,14 +58,62 @@ def index():
         top_5 = restaurant.query.order_by(desc(restaurant.rating)).limit(5).all()
         return render_template("home.html", restaurants=top_5)
 
+def get_cost_info(cart):
+    total_cost = 0.0
+    for itm in cart:
+        price = cart[itm][0]
+        quant = cart[itm][1]
+        total_cost += price * quant
+
+    restraunt_charges = total_cost * 0.10 # 10 %
+    delivery_cost = total_cost * 0.05 # 5 %
+
+    to_pay = "$" + str(sum((total_cost, delivery_cost, restraunt_charges)))
+    total_cost = "$" + str(total_cost)
+    restraunt_charges = "$" + str(restraunt_charges)
+    delivery_cost = "$" + str(delivery_cost)
+
+    return total_cost, restraunt_charges, delivery_cost, to_pay
+
+@app.route("/_update_cart", methods=["GET", "POST"])
+def update_cart():
+
+    item_added_id_str = request.args.get("item_clicked_id")
+    clicked_by = request.args.get("clicked_by")
+    item = menu.query.filter_by(item_id=int(item_added_id_str)).first()
+    cart = session['cart']
+
+    if clicked_by == "add":
+        if item_added_id_str in cart.keys():
+            cart.pop(item_added_id_str)
+        else:
+            cart[item_added_id_str] = [item.price, 1]
+    elif clicked_by == "minus":
+        if cart[item_added_id_str][1] == 1:
+            cart.pop(item_added_id_str)
+        else:
+            cart[item_added_id_str][1] -= 1
+    elif clicked_by == "plus":
+        cart[item_added_id_str][1] += 1
+
+    session['cart'] = cart
+    total_cost, restraunt_charges, delivery_cost, to_pay = get_cost_info(cart)
+
+    print(session['cart'])
+
+    return jsonify(cart=session['cart'],
+                   cart_len=len(session['cart']),
+                   total_cost=total_cost,
+                   restraunt_charges=restraunt_charges,
+                   delivery_cost=delivery_cost,
+                   to_pay=to_pay)
 
 @app.route("/restaurant.html")
 def restaurant_page():
-    # add_item_id = request.args.get("add_item")
-    # print(add_item_id)
+    session['cart'] = {}
+    session['total'] = 0
 
     current_rid = request.args.get("rid")
-    print(current_rid)
     if current_rid:
         current_rid = int(current_rid)
     else:

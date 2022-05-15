@@ -55,7 +55,6 @@
             </div>
         </div>
     </div>
-    <!-- Menu -->
     <div class="container position-relative">
         <div class="row">
             <div class="col-md-8 pt-3">
@@ -70,12 +69,39 @@
                           <div class="col-md-12 px-0 border-top">
                               <div class="">
                                   {% for item in category %}
+                                    <script type=text/javascript>
+                                      $(function() {
+                                        var clicked_add = '#add_cart_{{ item['item_id'] }}';
+                                        $(clicked_add).click( function() {
+                                          $(clicked_add).button('toggle')
+                                          $.getJSON($SCRIPT_ROOT + '/_update_cart', {
+                                            clicked_by : "add",
+                                            item_clicked_id : "{{ item['item_id'] }}"
+                                          }, function(data) {
+                                            if ( data.cart_len == 0 ) {
+                                              $('#cart-container').addClass("d-none");
+                                            } else {
+                                              $('#cart-container').removeClass("d-none");
+                                            }
+                                            if ({{ item['item_id'] }} in data.cart) {
+                                              $("#in-cart-{{ item['item_id'] }}").removeClass("d-none");
+                                            } else {
+                                              $("#in-cart-{{ item['item_id'] }}").addClass("d-none");
+                                            }
+                                            $("#total-cost").text(data.total_cost);
+                                            $("#delivery-cost").text(data.delivery_cost);
+                                            $("#restraunt-charges").text(data.restraunt_charges);
+                                            $("#to-pay").text(data.to_pay);
+                                          });
+                                          return false;
+                                        });
+                                      });
+                                    </script>
                                     <div class="p-3 border-bottom gold-members">
-                                        <span class="float-right">
-                                            <button class="btn btn-outline-secondary btn-sm" data-toggle="modal" data-target="#extras">ADD</button>
+                                        <span class="float-right pt-1 pr-2 d-flex align-items-center">
+                                          <button id="add_cart_{{ item['item_id'] }}" class="btn btn-outline-secondary btn-sm" data-target="#extras">ADD</button>
                                         </span>
                                         <div class="media">
-                                            <!-- <div class="mr-3 font-weight-bold text-danger non_veg">.</div> -->
                                             <div class="media-body">
                                                 <h6 class="mb-1">{{ item['name'] }}</h6>
                                                 <p class="text-muted mb-0">${{ item['price'] }}</p>
@@ -88,8 +114,7 @@
                         </div>
                       {% endfor %}
                     </div>
-                <div class="mb-3">
-            </div>
+            <div class="mb-3"></div>
             </div>
             <div class="col-md-4 pt-3">
                 <div class="fahad-cart-item rounded rounded shadow-sm overflow-hidden bg-white sticky_sidebar">
@@ -100,81 +125,86 @@
                             <p class="mb-0 small text-muted"><i class="feather-map-pin"></i> {{ restaurant_info['address'] }}</p>
                         </div>
                     </div>
-                    <div class="bg-white border-bottom py-2">
-                        <div class="gold-members d-flex align-items-center justify-content-between px-3 py-2 border-bottom">
-                            <div class="media align-items-center">
-                                <div class="mr-2 text-danger">&middot;</div>
-                                <div class="media-body">
-                                    <p class="m-0">Chicken Tikka Sub</p>
-                                </div>
+                    <div id="cart-container" class="bg-white d-none">
+                        {% for category_name, category in categories %}
+                          {% for item in category %}
+                          <script type=text/javascript>
+                            $(function() {
+                              var clicked_minus = '#minus-{{ item['item_id'] }}';
+                              var clicked_plus = '#plus-{{ item['item_id'] }}';
+
+                              $(clicked_minus).click( function() {
+                                $.getJSON($SCRIPT_ROOT + '/_update_cart', {
+                                  clicked_by : "minus",
+                                  item_clicked_id : "{{ item['item_id'] }}"
+                                }, function(data) {
+                                  if (!({{ item['item_id'] }} in data.cart)) {
+                                    $("#in-cart-{{ item['item_id'] }}").addClass("d-none");
+                                    $('#add_cart_{{ item['item_id'] }}').button('toggle')
+                                  } else {
+                                    $("#quant-{{ item['item_id'] }}").val(data.cart[{{ item['item_id'] }}][1])
+                                  }
+
+                                  $("#total-cost").text(data.total_cost);
+                                  $("#delivery-cost").text(data.delivery_cost);
+                                  $("#restraunt-charges").text(data.restraunt_charges);
+                                  $("#to-pay").text(data.to_pay);
+                                });
+                                return false;
+                              });
+
+                              $(clicked_plus).click( function() {
+                                $.getJSON($SCRIPT_ROOT + '/_update_cart', {
+                                  clicked_by : "plus",
+                                  item_clicked_id : "{{ item['item_id'] }}"
+                                }, function(data) {
+                                  if (!({{ item['item_id'] }} in data.cart)) {
+                                    $("#in-cart-{{ item['item_id'] }}").addClass("d-none");
+                                    $('#add_cart_{{ item['item_id'] }}').button('toggle')
+                                  } else {
+                                    $("#quant-{{ item['item_id'] }}").val(data.cart[{{ item['item_id'] }}][1])
+                                  }
+
+                                  $("#total-cost").text(data.total_cost);
+                                  $("#delivery-cost").text(data.delivery_cost);
+                                  $("#restraunt-charges").text(data.restraunt_charges);
+                                  $("#to-pay").text(data.to_pay);
+                                });
+                                return false;
+                              });
+                            });
+                          </script>
+                            <div id="in-cart-{{ item['item_id'] }}" class="d-none">
+                              <div class="gold-members d-flex align-items-center justify-content-between px-3 py-2 border-bottom">
+                                  <div class="media align-items-center">
+                                      <div class="pl-2 media-body">
+                                          <p class="m-0">{{ item['name'] }}</p>
+                                      </div>
+                                  </div>
+                                  <div class="d-flex align-items-center">
+                                      <span class="count-number float-right">
+                                        <button id="minus-{{ item['item_id'] }}" type="button" class="btn-sm left dec btn btn-outline-secondary">
+                                          <i class="feather-minus"></i>
+                                        </button><input id="quant-{{ item['item_id'] }}" class="count-number-input" value="1" type="text"><button id="plus-{{ item['item_id'] }}" type="button" class="btn-sm right inc btn btn-outline-secondary">
+                                          <i class="feather-plus"></i>
+                                        </button></span>
+                                      <p class="text-gray mb-0 float-right ml-3 text-muted small">${{ item['price'] }}</p>
+                                  </div>
+                              </div>
                             </div>
-                            <div class="d-flex align-items-center">
-                                <span class="count-number float-right"><button type="button" class="btn-sm left dec btn btn-outline-secondary"> <i class="feather-minus"></i> </button><input class="count-number-input" type="text" readonly="" value="2"><button type="button" class="btn-sm right inc btn btn-outline-secondary"> <i class="feather-plus"></i> </button></span>
-                                <p class="text-gray mb-0 float-right ml-2 text-muted small">$628</p>
-                            </div>
-                        </div>
-                        <div class="gold-members d-flex align-items-center justify-content-between px-3 py-2 border-bottom">
-                            <div class="media align-items-center">
-                                <div class="mr-2 text-danger">&middot;</div>
-                                <div class="media-body">
-                                    <p class="m-0">Methi Chicken Dry
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="d-flex align-items-center">
-                                <span class="count-number float-right"><button type="button" class="btn-sm left dec btn btn-outline-secondary"> <i class="feather-minus"></i> </button><input class="count-number-input" type="text" readonly="" value="2"><button type="button" class="btn-sm right inc btn btn-outline-secondary"> <i class="feather-plus"></i> </button></span>
-                                <p class="text-gray mb-0 float-right ml-2 text-muted small">$628</p>
-                            </div>
-                        </div>
-                        <div class="gold-members d-flex align-items-center justify-content-between px-3 py-2 border-bottom">
-                            <div class="media align-items-center">
-                                <div class="mr-2 text-danger">&middot;</div>
-                                <div class="media-body">
-                                    <p class="m-0">Reshmi Kebab
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="d-flex align-items-center">
-                                <span class="count-number float-right"><button type="button" class="btn-sm left dec btn btn-outline-secondary"> <i class="feather-minus"></i> </button><input class="count-number-input" type="text" readonly="" value="2"><button type="button" class="btn-sm right inc btn btn-outline-secondary"> <i class="feather-plus"></i> </button></span>
-                                <p class="text-gray mb-0 float-right ml-2 text-muted small">$628</p>
-                            </div>
-                        </div>
-                        <div class="gold-members d-flex align-items-center justify-content-between px-3 py-2 border-bottom">
-                            <div class="media align-items-center">
-                                <div class="mr-2 text-success">&middot;</div>
-                                <div class="media-body">
-                                    <p class="m-0">Lemon Cheese Dry
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="d-flex align-items-center">
-                                <span class="count-number float-right"><button type="button" class="btn-sm left dec btn btn-outline-secondary"> <i class="feather-minus"></i> </button><input class="count-number-input" type="text" readonly="" value="2"><button type="button" class="btn-sm right inc btn btn-outline-secondary"> <i class="feather-plus"></i> </button></span>
-                                <p class="text-gray mb-0 float-right ml-2 text-muted small">$628</p>
-                            </div>
-                        </div>
-                        <div class="gold-members d-flex align-items-center justify-content-between px-3 py-2">
-                            <div class="media align-items-center">
-                                <div class="mr-2 text-success">&middot;</div>
-                                <div class="media-body">
-                                    <p class="m-0">Rara Paneer</p>
-                                </div>
-                            </div>
-                            <div class="d-flex align-items-center">
-                                <span class="count-number float-right"><button type="button" class="btn-sm left dec btn btn-outline-secondary"> <i class="feather-minus"></i> </button><input class="count-number-input" type="text" readonly="" value="2"><button type="button" class="btn-sm right inc btn btn-outline-secondary"> <i class="feather-plus"></i> </button></span>
-                                <p class="text-gray mb-0 float-right ml-2 text-muted small">$628</p>
-                            </div>
-                        </div>
+                          {% endfor %}
+                        {% endfor %}
                     </div>
                     <div class="bg-white p-3 clearfix border-bottom">
-                        <p class="mb-1">Item Total <span class="float-right text-dark">$3140</span></p>
-                        <p class="mb-1">Restaurant Charges <span class="float-right text-dark">$62.8</span></p>
-                        <p class="mb-1">Delivery Fee<span class="text-info ml-1"></span><span class="float-right text-dark">$10</span></p>
+                        <p class="mb-1">Item Total <span id="total-cost" class="float-right text-dark">$0.0</span></p>
+                        <p class="mb-1">Restaurant Charges <span id="restraunt-charges" class="float-right text-dark">$0.0</span></p>
+                        <p class="mb-1">Delivery Fee<span class="text-info ml-1"></span><span id="delivery-cost" class="float-right text-dark">$0.0</span></p>
                         <!-- <p class="mb-1 text-success">Total Discount<span class="float-right text-success">$1884</span></p> -->
                         <hr>
-                        <h6 class="font-weight-bold mb-0">TO PAY <span class="float-right">$1329</span></h6>
+                        <h6 class="font-weight-bold mb-0">TO PAY <span id="to-pay" class="float-right">$0.0</span></h6>
                     </div>
                     <div class="p-3">
-                        <a class="btn btn-success btn-block btn-lg" href="successful.html">PAY $1329<i class="feather-arrow-right"></i></a>
+                        <a class="btn btn-success btn-block btn-lg" href="successful.html">CHECKOUT<i class="feather-arrow-right"></i></a>
                     </div>
                 </div>
             </div>
