@@ -53,18 +53,28 @@ def index():
         top_5 = restaurant.query.order_by(desc(restaurant.rating)).limit(5).all()
         return render_template("home.html", restaurants=top_5)
 
+
 @app.route("/restaurant.html")
 def restaurant_page():
-    current_rid = int(request.args.get("rid"))
+    # add_item_id = request.args.get("add_item")
+    # print(add_item_id)
+
+    current_rid = request.args.get("rid")
+    print(current_rid)
+    if current_rid:
+        current_rid = int(current_rid)
+    else:
+        pass # error page
+
     restaurant_info = restaurant.query.filter_by(rid=current_rid).first()
+
     foods = menu.query.filter_by(rid=current_rid, category="food").all()
     drinks = menu.query.filter_by(rid=current_rid, category="drink").all()
     desserts = menu.query.filter_by(rid=current_rid, category="dessert").all()
+    categories = [("Food", foods), ("Drinks", drinks), ("Desserts", desserts)]
 
     return render_template("restaurant.html", restaurant_info=restaurant_info,
-                                              foods=foods,
-                                              drinks=drinks,
-                                              desserts=desserts)
+                                              categories=categories)
 
 @app.route("/login", methods=["GET", "POST"])
 def login():

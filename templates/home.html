@@ -27,7 +27,7 @@
                    height: 200px;
                    background-image: url('static/img/home_bg_img.jpg');">
           <div class="container d-flex align-items-center justify-content-center">
-            <form action="#" method="get">
+            <form action="{{ url_for('index') }}" method="get">
               <div class="row" style="padding-top:75px;;width:600px;">
                 <div class="col">
                   <div class="search input-group">
@@ -74,14 +74,13 @@
                     <div class="list-card-image">
                         <div class="star position-absolute"><span class="badge badge-success"><i class="feather-star"></i> {{ restaurant['rating'] }} </span></div>
                         <a href="{{url_for('restaurant_page', rid=restaurant['rid'])}}">
-                            <img alt="#" src="static/img/trending1.png" class="img-fluid item-img w-100">
-
+                            <img alt="#" src="{{ restaurant['img_path'] }}" class="img-fluid item-img w-100">
                         </a>
                     </div>
                     <div class="p-3 position-relative">
                         <div class="list-card-body">
                             <h6 class="mb-1">
-                              <a href="restaurant.html" class="text-black">{{ restaurant['name'] }}</a>
+                              <a href="{{url_for('restaurant_page', rid=restaurant['rid'])}}" class="text-black">{{ restaurant['name'] }}</a>
                         </div>
                         <div class="list-card-body">
                               <h6 class="mb-2"><t class="text-gray font-weight-light">Sub-Heading</t></h6>

@@ -50,7 +50,7 @@
                             <!-- search -->
                             {% if url_for(request.endpoint) != "/" or request.args['search_val'] %}
                               <div class="container">
-                                <form action="#" method="get">
+                                <form action="{{ url_for('index') }}" method="get">
                                   <div class="search input-group align-items-center justify-content-center py-1">
                                       <input class="form-control col-md-8" type="text" name="search_val" value="{{ request.args['search_val'] }}"
                                       style="border-radius:20px;height:40px;font-size:14px;padding-left:25px" placeholder="Search">

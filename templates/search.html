@@ -62,14 +62,14 @@
                                           <div class="star position-absolute"><span class="badge badge-success"><i class="feather-star"></i> {{restaurant['rating']}} </span></div>
                                           <!-- <div class="favourite-heart text-danger position-absolute"><a href="#"><i class="feather-heart"></i></a></div> -->
                                           <!-- <div class="member-plan position-absolute"><span class="badge badge-dark">Promoted</span></div> -->
-                                          <a href="restaurant.html">
+                                          <a href="{{url_for('restaurant_page', rid=restaurant['rid'])}}">
                                               <!-- <img alt="#" src="img/trending1.png" class="img-fluid item-img w-100"> -->
-                                              <img src="img/trending1.png" class="img-fluid item-img w-100">
+                                              <img src="{{ restaurant['img_path'] }}" class="img-fluid item-img w-100">
                                           </a>
                                       </div>
                                       <div class="p-3 position-relative">
                                           <div class="list-card-body">
-                                              <h6 class="mb-1"><a href="restaurant.html" class="text-black">{{restaurant['name']}}
+                                              <h6 class="mb-1"><a href="{{url_for('restaurant_page', rid=restaurant['rid'])}}" class="text-black">{{restaurant['name']}}
                                                 </a>
                                               </h6>
                                               <div class="list-card-body">
