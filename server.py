@@ -20,8 +20,10 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 
 class order_details (db.Model):
-    rid = db.Column(db.Integer,db.ForeignKey('restaurant.rid'), primary_key=True)
-    user_id = db.Column(db.Integer,db.ForeignKey('user.id'), primary_key=True)
+    order_id = db.Column(db.Integer, primary_key=True)
+    rid = db.Column(db.Integer,db.ForeignKey('restaurant.rid'))
+    user_id = db.Column(db.Integer,db.ForeignKey('user.id'))
+    delivery_id = db.Column(db.Integer,db.ForeignKey('user.id'))
     total_cost = db.Column(db.String(120))
 
 
@@ -178,8 +180,6 @@ def update_cart():
     session['cart'] = cart
     total_cost, restraunt_charges, delivery_cost, to_pay = get_cost_info(cart)
 
-    print(session['cart'])
-
     return jsonify(cart=session['cart'],
                    cart_len=len(session['cart']),
                    total_cost=total_cost,
@@ -264,6 +264,12 @@ def restaurant_page():
 @login_required
 def checkout():
     update_cart()
+    new_order = order_details(rid=int(session['restaurant_info']['rid']),
+                             user_id=USER_ID,
+                             total_cost=session['total'])
+
+    db.session.add(new_order)
+    db.session.commit()
     return render_template("checkout.html", restaurant_info=session['restaurant_info'],
                                             categories=session['categories'])
 
@@ -300,7 +306,7 @@ def profile():
 @app.route("/aboutus.html")
 def aboutus():
     return render_template("aboutus.html")
-    
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
