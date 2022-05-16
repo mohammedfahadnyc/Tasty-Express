@@ -7,13 +7,17 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 db = SQLAlchemy(app)
 
 app.secret_key = 'BAD_SECRET_KEY'
+RESTURANT_ID = 0
+USER_ID = 0
+DELIVERY_STATUS = ""
 
 class user(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80))
+    # username = db.Column(db.String(80))
     email = db.Column(db.String(120))
     name = db.Column(db.String(120))
     password = db.Column(db.String(80))
+    address = db.Column(db.String(80))
 
 class restaurant(db.Model):
     rid = db.Column(db.Integer, primary_key=True)
@@ -30,6 +34,7 @@ class menu(db.Model):
     price = db.Column(db.Integer)
     category = db.Column(db.String(80))
     db.CheckConstraint('category in ("food", "drink", "dessert")', name='category_check')
+
 
 @app.before_first_request
 def initialize():
@@ -119,7 +124,15 @@ def restaurant_page():
     else:
         pass # error page
 
+    #Global rid, used for api calls to the delivery person
+    global RESTURANT_ID, DELIVERY_STATUS
+    RESTURANT_ID = current_rid
+
+
+    DELIVERY_STATUS = f"{restaurant.query.get(RESTURANT_ID).name} Has Received The Order!"
+
     restaurant_info = restaurant.query.filter_by(rid=current_rid).first()
+    resturant_address = restaurant.query.filter_by(rid=current_rid).first()
 
     foods = menu.query.filter_by(rid=current_rid, category="food").all()
     drinks = menu.query.filter_by(rid=current_rid, category="drink").all()
@@ -135,8 +148,10 @@ def login():
         uname = request.form["uname"]
         passw = request.form["passw"]
 
-        login = user.query.filter_by(username=uname, password=passw).first()
+        login = user.query.filter_by(email=uname, password=passw).first()
         if login is not None:
+            global USER_ID
+            USER_ID = login.id
             return redirect(url_for('index')) # goes to home page / and url also changes
     return render_template("login.html")
 
@@ -145,16 +160,54 @@ def login():
 def signup():
     if request.method == "POST":
         name = request.form['name']
-        uname = request.form['uname']
+        email = request.form['uname']
         passw = request.form['passw']
+        address = request.form['address']
 
-        register = user(name=name, username=uname, password=passw)
+        register = user(name=name, email=email, password=passw,address=address)
         db.session.add(register)
         db.session.commit()
         return render_template("login.html")
     return render_template("signup.html")
 
 
+@app.route("/order")
+def order_status():
+    global DELIVERY_STATUS
+    return render_template('my_order.html',status=DELIVERY_STATUS)
+
+@app.route("/dasher",methods=["GET","POST"])
+def dasher():
+    global RESTURANT_ID,USER_ID, DELIVERY_STATUS
+    if request.method == "GET" :
+
+        # USER_ID = 1
+        # RESTURANT_ID = 1
+        user_data = user.query.get(USER_ID)
+        restaurant_data = restaurant.query.get(RESTURANT_ID)
+        from_address = restaurant_data.address
+        resturant_name = restaurant_data.name
+        to_address = user_data.address
+        to_name = user_data.name
+        data = {
+            "Order For"  : f"{to_name}",
+            "Resturant Name" : f"{resturant_name}",
+            "Resturant Address" : f"{from_address}",
+            "Delivery Address" : f"{to_address}",
+        }
+
+        DELIVERY_STATUS = "Your Delivery Person Is On their Way with your order."
+        return jsonify(data)
+
+    elif request.method == "POST":
+        DELIVERY_STATUS = "Delivered"
+        return jsonify("Success")
+
+
+
+
 if __name__ == "__main__":
     db.create_all()
-    app.run(debug=True, port=8081)
+    # app.run(debug=True, port=8081)
+    app.run(host="0.0.0.0")
+
