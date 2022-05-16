@@ -11,6 +11,14 @@ RESTURANT_ID = 0
 USER_ID = 0
 DELIVERY_STATUS = ""
 
+class complaints(db.Model):
+    cid = db.Column(db.Integer, primary_key=True)
+    restaurant_name = db.Column(db.String(80))
+    employee = db.Column(db.String(120))
+    numWarnings = db.Column(db.Integer)
+    text = db.Column(db.VARCHAR)
+    username = db.Column(db.String(120))
+
 class user(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     # username = db.Column(db.String(80))
@@ -115,6 +123,7 @@ def update_cart():
                    delivery_cost=delivery_cost,
                    to_pay=to_pay)
 
+
 def row_to_dict(row):
     row_dict = row.__dict__
     row_dict.pop("_sa_instance_state")
@@ -125,6 +134,28 @@ def table_to_lst(table):
     for row in table:
         table_lst.append(row_to_dict(row))
     return table_lst
+
+@app.route("/manager.html")
+def manager_page():
+    return render_template("manager.html")
+    # return render_template("manager.html", table = table)
+
+
+@app.route("/complaints.html", methods=['POST','GET'])
+def complaints_page():
+    if request.method == "POST":
+        uname = request.form['uname']
+        rest = request.form['rest']
+        employee = request.form['employee']
+        complaint = request.form['complaint']
+
+        register = complaints(username=uname, restaurant_name=rest, employee=employee, text=complaint)
+        db.session.add(register)
+        db.session.commit()
+        return render_template("home.html")
+    else:
+        return render_template("complaints.html")
+
 
 @app.route("/restaurant.html")
 def restaurant_page():
