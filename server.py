@@ -12,14 +12,17 @@ app.secret_key = 'BAD_SECRET_KEY'
 RESTURANT_ID = 0
 USER_ID = 0
 DELIVERY_STATUS = ""
-delivery_time = ""
 
 class complaints(db.Model):
     cid = db.Column(db.Integer, primary_key=True)
     restaurant_name = db.Column(db.String(80))
     employee = db.Column(db.String(120))
+<<<<<<< HEAD
     userWarnings = db.Column(db.Integer)
     emplnumWarnings = db.Column(db.Integer)
+=======
+    numWarnings = db.Column(db.Integer)
+>>>>>>> adba21b69f4cf4e7f72ee7863036281c4211ff96
     text = db.Column(db.VARCHAR)
     username = db.Column(db.String(120))
 
@@ -152,6 +155,7 @@ def complaints_page():
         rest = request.form['rest']
         employee = request.form['employee']
         complaint = request.form['complaint']
+<<<<<<< HEAD
         query = complaints.query.order_by(complaints.cid.desc()).all()
         emplwarnings = 0
         if employee :
@@ -163,6 +167,10 @@ def complaints_page():
         register = complaints(username=uname, restaurant_name=rest,
                               employee=employee, text=complaint,
                               emplnumWarnings=emplwarnings)
+=======
+
+        register = complaints(username=uname, restaurant_name=rest, employee=employee, text=complaint)
+>>>>>>> adba21b69f4cf4e7f72ee7863036281c4211ff96
         db.session.add(register)
         db.session.commit()
         return render_template("home.html")
@@ -240,11 +248,19 @@ def signup():
 @app.route("/order")
 def order_status():
     global DELIVERY_STATUS
+<<<<<<< HEAD
     return render_template('my_order.html',status=DELIVERY_STATUS,day=delivery_time)
 
 @app.route("/dasher",methods=["GET","POST"])
 def dasher():
     global RESTURANT_ID,USER_ID, DELIVERY_STATUS, delivery_time
+=======
+    return render_template('my_order.html',status=DELIVERY_STATUS)
+
+@app.route("/dasher",methods=["GET","POST"])
+def dasher():
+    global RESTURANT_ID,USER_ID, DELIVERY_STATUS
+>>>>>>> adba21b69f4cf4e7f72ee7863036281c4211ff96
     if request.method == "GET" :
 
         # USER_ID = 1
@@ -267,8 +283,6 @@ def dasher():
 
     elif request.method == "POST":
         DELIVERY_STATUS = "Delivered"
-        now = datetime.now()
-        delivery_time = now.strftime("%m/%d/%Y, %H:%M:%S")
         return jsonify("Success")
 
 
@@ -276,5 +290,10 @@ def dasher():
 
 if __name__ == "__main__":
     db.create_all()
+<<<<<<< HEAD
     # app.run(debug=True, port=8081)
     app.run(host="0.0.0.0")
+=======
+    app.run(debug=True, port=8081)
+    #app.run(host="0.0.0.0")
+>>>>>>> adba21b69f4cf4e7f72ee7863036281c4211ff96
