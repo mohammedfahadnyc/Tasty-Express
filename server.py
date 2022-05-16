@@ -39,8 +39,9 @@ class menu(db.Model):
 @app.before_first_request
 def initialize():
     session['account_type'] = "visitor"
-    # session['cart'] = {}
-    # session['total'] = 0
+    session['cart'] = {}
+    session['total'] = 0
+    session['session_rid'] = None
 
 def search(search_val):
     # currently just using a simple like filter
@@ -82,24 +83,25 @@ def get_cost_info(cart):
 
 @app.route("/_update_cart", methods=["GET", "POST"])
 def update_cart():
-
-    item_added_id_str = request.args.get("item_clicked_id")
-    clicked_by = request.args.get("clicked_by")
-    item = menu.query.filter_by(item_id=int(item_added_id_str)).first()
     cart = session['cart']
+    item_added_id_str = request.args.get("item_clicked_id")
 
-    if clicked_by == "add":
-        if item_added_id_str in cart.keys():
-            cart.pop(item_added_id_str)
-        else:
-            cart[item_added_id_str] = [item.price, 1]
-    elif clicked_by == "minus":
-        if cart[item_added_id_str][1] == 1:
-            cart.pop(item_added_id_str)
-        else:
-            cart[item_added_id_str][1] -= 1
-    elif clicked_by == "plus":
-        cart[item_added_id_str][1] += 1
+    if item_added_id_str:
+        clicked_by = request.args.get("clicked_by")
+        item = menu.query.filter_by(item_id=int(item_added_id_str)).first()
+
+        if clicked_by == "add":
+            if item_added_id_str in cart.keys():
+                cart.pop(item_added_id_str)
+            else:
+                cart[item_added_id_str] = [item.price, 1]
+        elif clicked_by == "minus":
+            if cart[item_added_id_str][1] == 1:
+                cart.pop(item_added_id_str)
+            else:
+                cart[item_added_id_str][1] -= 1
+        elif clicked_by == "plus":
+            cart[item_added_id_str][1] += 1
 
     session['cart'] = cart
     total_cost, restraunt_charges, delivery_cost, to_pay = get_cost_info(cart)
@@ -113,34 +115,54 @@ def update_cart():
                    delivery_cost=delivery_cost,
                    to_pay=to_pay)
 
+def row_to_dict(row):
+    row_dict = row.__dict__
+    row_dict.pop("_sa_instance_state")
+    return row_dict
+
+def table_to_lst(table):
+    table_lst = []
+    for row in table:
+        table_lst.append(row_to_dict(row))
+    return table_lst
+
 @app.route("/restaurant.html")
 def restaurant_page():
-    session['cart'] = {}
-    session['total'] = 0
-
     current_rid = request.args.get("rid")
     if current_rid:
         current_rid = int(current_rid)
     else:
         pass # error page
 
+    # WIP: was trying to make the carts stay after refreshing restraunt page
+    if True: #session['session_rid'] != current_rid:
+        session['cart'] = {}
+        session['total'] = 0
+        session['session_rid'] = current_rid
+
     #Global rid, used for api calls to the delivery person
     global RESTURANT_ID, DELIVERY_STATUS
     RESTURANT_ID = current_rid
-
-
     DELIVERY_STATUS = f"{restaurant.query.get(RESTURANT_ID).name} Has Received The Order!"
 
-    restaurant_info = restaurant.query.filter_by(rid=current_rid).first()
-    resturant_address = restaurant.query.filter_by(rid=current_rid).first()
+    session['restaurant_info'] = row_to_dict(restaurant.query.filter_by(rid=current_rid).first())
 
     foods = menu.query.filter_by(rid=current_rid, category="food").all()
     drinks = menu.query.filter_by(rid=current_rid, category="drink").all()
     desserts = menu.query.filter_by(rid=current_rid, category="dessert").all()
-    categories = [("Food", foods), ("Drinks", drinks), ("Desserts", desserts)]
+    session['categories'] = [("Food", table_to_lst(foods)), ("Drinks", table_to_lst(drinks)), ("Desserts", table_to_lst(desserts))]
 
-    return render_template("restaurant.html", restaurant_info=restaurant_info,
-                                              categories=categories)
+    return render_template("restaurant.html", restaurant_info=session['restaurant_info'],
+                                              categories=session['categories'] )
+@app.route("/checkout.html")
+def checkout():
+    update_cart()
+    return render_template("checkout.html", restaurant_info=session['restaurant_info'],
+                                            categories=session['categories'])
+
+@app.route("/successful.html")
+def successful():
+    return render_template("successful.html")
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -208,6 +230,5 @@ def dasher():
 
 if __name__ == "__main__":
     db.create_all()
-    # app.run(debug=True, port=8081)
-    app.run(host="0.0.0.0")
-
+    app.run(debug=True, port=8081)
+    #app.run(host="0.0.0.0")
