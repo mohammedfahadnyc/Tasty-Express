@@ -1,7 +1,9 @@
+from datetime import datetime
+
 from flask import Flask, render_template, flash, redirect, url_for, session, logging, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import desc
-from datetime import datetime
+
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 db = SQLAlchemy(app)
@@ -12,6 +14,14 @@ USER_ID = 0
 DELIVERY_STATUS = ""
 delivery_time = ""
 
+class complaints(db.Model):
+    cid = db.Column(db.Integer, primary_key=True)
+    restaurant_name = db.Column(db.String(80))
+    employee = db.Column(db.String(120))
+    userWarnings = db.Column(db.Integer)
+    emplnumWarnings = db.Column(db.Integer)
+    text = db.Column(db.VARCHAR)
+    username = db.Column(db.String(120))
 
 class user(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -41,8 +51,9 @@ class menu(db.Model):
 @app.before_first_request
 def initialize():
     session['account_type'] = "visitor"
-    # session['cart'] = {}
-    # session['total'] = 0
+    session['cart'] = {}
+    session['total'] = 0
+    session['session_rid'] = None
 
 def search(search_val):
     # currently just using a simple like filter
@@ -84,24 +95,25 @@ def get_cost_info(cart):
 
 @app.route("/_update_cart", methods=["GET", "POST"])
 def update_cart():
-
-    item_added_id_str = request.args.get("item_clicked_id")
-    clicked_by = request.args.get("clicked_by")
-    item = menu.query.filter_by(item_id=int(item_added_id_str)).first()
     cart = session['cart']
+    item_added_id_str = request.args.get("item_clicked_id")
 
-    if clicked_by == "add":
-        if item_added_id_str in cart.keys():
-            cart.pop(item_added_id_str)
-        else:
-            cart[item_added_id_str] = [item.price, 1]
-    elif clicked_by == "minus":
-        if cart[item_added_id_str][1] == 1:
-            cart.pop(item_added_id_str)
-        else:
-            cart[item_added_id_str][1] -= 1
-    elif clicked_by == "plus":
-        cart[item_added_id_str][1] += 1
+    if item_added_id_str:
+        clicked_by = request.args.get("clicked_by")
+        item = menu.query.filter_by(item_id=int(item_added_id_str)).first()
+
+        if clicked_by == "add":
+            if item_added_id_str in cart.keys():
+                cart.pop(item_added_id_str)
+            else:
+                cart[item_added_id_str] = [item.price, 1]
+        elif clicked_by == "minus":
+            if cart[item_added_id_str][1] == 1:
+                cart.pop(item_added_id_str)
+            else:
+                cart[item_added_id_str][1] -= 1
+        elif clicked_by == "plus":
+            cart[item_added_id_str][1] += 1
 
     session['cart'] = cart
     total_cost, restraunt_charges, delivery_cost, to_pay = get_cost_info(cart)
@@ -115,34 +127,86 @@ def update_cart():
                    delivery_cost=delivery_cost,
                    to_pay=to_pay)
 
+
+def row_to_dict(row):
+    row_dict = row.__dict__
+    row_dict.pop("_sa_instance_state")
+    return row_dict
+
+def table_to_lst(table):
+    table_lst = []
+    for row in table:
+        table_lst.append(row_to_dict(row))
+    return table_lst
+
+@app.route("/manager.html")
+def manager_page():
+    return render_template("manager.html")
+    # return render_template("manager.html", table = table)
+
+
+@app.route("/complaints.html", methods=['POST','GET'])
+def complaints_page():
+    if request.method == "POST":
+        uname = request.form['uname']
+        rest = request.form['rest']
+        employee = request.form['employee']
+        complaint = request.form['complaint']
+        query = complaints.query.order_by(complaints.cid.desc()).all()
+        emplwarnings = 0
+        if employee :
+            for data in query :
+                if data.employee  == employee :
+                    emplwarnings = data.emplnumWarnings
+            emplwarnings += 1
+
+        register = complaints(username=uname, restaurant_name=rest,
+                              employee=employee, text=complaint,
+                              emplnumWarnings=emplwarnings)
+        db.session.add(register)
+        db.session.commit()
+        return render_template("home.html")
+    else:
+        return render_template("complaints.html")
+
+
 @app.route("/restaurant.html")
 def restaurant_page():
-    session['cart'] = {}
-    session['total'] = 0
-
     current_rid = request.args.get("rid")
     if current_rid:
         current_rid = int(current_rid)
     else:
         pass # error page
 
+    # WIP: was trying to make the carts stay after refreshing restraunt page
+    if True: #session['session_rid'] != current_rid:
+        session['cart'] = {}
+        session['total'] = 0
+        session['session_rid'] = current_rid
+
     #Global rid, used for api calls to the delivery person
     global RESTURANT_ID, DELIVERY_STATUS
     RESTURANT_ID = current_rid
-
-
     DELIVERY_STATUS = f"{restaurant.query.get(RESTURANT_ID).name} Has Received The Order!"
 
-    restaurant_info = restaurant.query.filter_by(rid=current_rid).first()
-    resturant_address = restaurant.query.filter_by(rid=current_rid).first()
+    session['restaurant_info'] = row_to_dict(restaurant.query.filter_by(rid=current_rid).first())
 
     foods = menu.query.filter_by(rid=current_rid, category="food").all()
     drinks = menu.query.filter_by(rid=current_rid, category="drink").all()
     desserts = menu.query.filter_by(rid=current_rid, category="dessert").all()
-    categories = [("Food", foods), ("Drinks", drinks), ("Desserts", desserts)]
+    session['categories'] = [("Food", table_to_lst(foods)), ("Drinks", table_to_lst(drinks)), ("Desserts", table_to_lst(desserts))]
 
-    return render_template("restaurant.html", restaurant_info=restaurant_info,
-                                              categories=categories)
+    return render_template("restaurant.html", restaurant_info=session['restaurant_info'],
+                                              categories=session['categories'] )
+@app.route("/checkout.html")
+def checkout():
+    update_cart()
+    return render_template("checkout.html", restaurant_info=session['restaurant_info'],
+                                            categories=session['categories'])
+
+@app.route("/successful.html")
+def successful():
+    return render_template("successful.html")
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -173,14 +237,14 @@ def signup():
     return render_template("signup.html")
 
 
-@app.route("/orders")
+@app.route("/order")
 def order_status():
-    global DELIVERY_STATUS,today,delivery_time
-    return render_template('orders.html',status=DELIVERY_STATUS,day=delivery_time)
+    global DELIVERY_STATUS
+    return render_template('my_order.html',status=DELIVERY_STATUS,day=delivery_time)
 
 @app.route("/dasher",methods=["GET","POST"])
 def dasher():
-    global RESTURANT_ID,USER_ID, DELIVERY_STATUS,delivery_time
+    global RESTURANT_ID,USER_ID, DELIVERY_STATUS, delivery_time
     if request.method == "GET" :
 
         # USER_ID = 1
@@ -214,4 +278,3 @@ if __name__ == "__main__":
     db.create_all()
     # app.run(debug=True, port=8081)
     app.run(host="0.0.0.0")
-
