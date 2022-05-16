@@ -229,6 +229,32 @@ def checkout():
 def successful():
     return render_template("successful.html")
 
+@app.route("/profile.html", methods=["GET", "POST"])
+def profile():
+    user_info = {}
+    print(request.form)
+    if request.method == "POST":
+        # get from form
+        user_info = {"first_name": request.form['user_firstname1'],
+                     "last_name": request.form['user_lastname1'],
+                     "phone": request.form['user_phoneNumber1'],
+                     "email": request.form['user_email1'],
+                     "address": request.form['user_address1']}
+    else:
+        # get from user db
+        # dummy values for now
+        user_info = {"first_name": "Firstname",
+                     "last_name": "Lastname",
+                     "phone": "1234567890",
+                     "email": "firstlast@email.com",
+                     "address": "1111 Queens blvd, NY, 11111"}
+
+    return render_template("profile.html", user_info=user_info)
+
+@app.route("/aboutus.html")
+def aboutus():
+    return render_template("aboutus.html")
+    
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -259,6 +285,11 @@ def signup():
         return render_template("login.html")
     return render_template("signup.html")
 
+@app.route("/logout")
+def logout():
+    session['account_type'] = 'visitor'
+    session['user_first_name'] = None
+    return redirect(url_for('index'))
 
 @app.route("/order")
 def order_status():
