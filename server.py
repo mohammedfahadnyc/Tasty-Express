@@ -15,9 +15,22 @@ app.secret_key = 'BAD_SECRET_KEY'
 RESTURANT_ID = 0
 USER_ID = 0
 DELIVERY_STATUS = ""
-
+VIP_DISCOUNT = 5
 login_manager = LoginManager()
 login_manager.init_app(app)
+
+class order_details (db.Model):
+    rid = db.Column(db.Integer,db.ForeignKey('restaurant.rid'), primary_key=True)
+    user_id = db.Column(db.Integer,db.ForeignKey('user.id'), primary_key=True)
+    total_cost = db.Column(db.String(120))
+
+
+class employee (db.Model):
+    id = db.Column(db.Integer,db.ForeignKey('user.id'), primary_key=True)
+    rid= db.Column(db.Integer,db.ForeignKey('restaurant.rid'), primary_key=True)
+    salary = db.Column(db.String(120))
+    warnings = db.Column(db.String(120))
+    category = db.Column(db.String(80))
 
 
 class complaints(db.Model):
@@ -42,6 +55,11 @@ class user(UserMixin,db.Model):
     # last_name = db.Column(db.String(120))
     password = db.Column(db.String(80))
     address = db.Column(db.String(80))
+    phone_number = db.Column(db.String(80))
+    numWarnings = db.Column(db.Integer)
+    category = db.Column(db.String(80))
+
+
 
 class restaurant(db.Model):
     rid = db.Column(db.Integer, primary_key=True)
@@ -81,6 +99,15 @@ def base():
     return dict(account_type=session['account_type'],
                 user_first_name=session['user_first_name'])
 
+
+@app.route("/manager.html")
+# @login_required
+def manager_page():
+    table = complaints.query.all()
+    return render_template("manager.html", complaints=table)
+    #approve complaints,  update the warnings, blacklist the user
+
+
 def search(search_val):
     # currently just using a simple like filter
     # I added limit of 9 to keep the page short, but it works with no limit
@@ -106,6 +133,7 @@ def format_dollar(dol_int):
     return '${0:.2f}'.format(dol_int)
 
 def get_cost_info(cart):
+    global VIP_DISCOUNT
     total_cost = 0.0
     for itm in cart:
         price = cart[itm][0]
@@ -119,6 +147,7 @@ def get_cost_info(cart):
     total_cost = format_dollar(total_cost)
     restraunt_charges = format_dollar(restraunt_charges)
     delivery_cost = format_dollar(delivery_cost)
+    #add vip discount
 
     return total_cost, restraunt_charges, delivery_cost, to_pay
 
@@ -170,11 +199,6 @@ def table_to_lst(table):
         table_lst.append(row_to_dict(row))
     return table_lst
 
-@app.route("/manager.html")
-@login_required
-def manager_page():
-    return render_template("manager.html")
-    # return render_template("manager.html", table = table)
 
 
 @app.route("/complaints.html", methods=['POST','GET'])
@@ -243,6 +267,7 @@ def checkout():
     return render_template("checkout.html", restaurant_info=session['restaurant_info'],
                                             categories=session['categories'])
 
+
 @app.route("/successful.html")
 @login_required
 def successful():
@@ -305,12 +330,13 @@ def signup():
         email = request.form['uname']
         passw = request.form['passw']
         address = request.form['address']
+        phone = request.form['num']
         if user.query.filter_by(email=email).first():
             flash("User Already Exists, Log in Now")
             return redirect (url_for('login'))
 
         hashed_password = generate_password_hash(passw,method='pbkdf2:sha256', salt_length=16)
-        new_user = user(name=name, email=email, password=hashed_password,address=address)
+        new_user = user(name=name, email=email, password=hashed_password,address=address,phone_number=phone)
         db.session.add(new_user)
         db.session.commit()
         login_user(new_user)
