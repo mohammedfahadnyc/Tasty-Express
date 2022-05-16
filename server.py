@@ -1,7 +1,7 @@
 from flask import Flask, render_template, flash, redirect, url_for, session, logging, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import desc
-from datetime import datetime
+
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 db = SQLAlchemy(app)
@@ -10,8 +10,14 @@ app.secret_key = 'BAD_SECRET_KEY'
 RESTURANT_ID = 0
 USER_ID = 0
 DELIVERY_STATUS = ""
-delivery_time = ""
 
+class complaints(db.Model):
+    cid = db.Column(db.Integer, primary_key=True)
+    restaurant_name = db.Column(db.String(80))
+    employee = db.Column(db.String(120))
+    numWarnings = db.Column(db.Integer)
+    text = db.Column(db.VARCHAR)
+    username = db.Column(db.String(120))
 
 class user(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -115,6 +121,28 @@ def update_cart():
                    delivery_cost=delivery_cost,
                    to_pay=to_pay)
 
+@app.route("/manager.html")
+def manager_page():
+    return render_template("manager.html")
+    # return render_template("manager.html", table = table)
+
+
+@app.route("/complaints.html", methods=['POST','GET'])
+def complaints_page():
+    if request.method == "POST":
+        uname = request.form['uname']
+        rest = request.form['rest']
+        employee = request.form['employee']
+        complaint = request.form['complaint']
+
+        register = complaints(username=uname, restaurant_name=rest, employee=employee, text=complaint)
+        db.session.add(register)
+        db.session.commit()
+        return render_template("home.html")
+    else:
+        return render_template("complaints.html")
+
+
 @app.route("/restaurant.html")
 def restaurant_page():
     session['cart'] = {}
@@ -173,14 +201,14 @@ def signup():
     return render_template("signup.html")
 
 
-@app.route("/orders")
+@app.route("/order")
 def order_status():
-    global DELIVERY_STATUS,today,delivery_time
-    return render_template('orders.html',status=DELIVERY_STATUS,day=delivery_time)
+    global DELIVERY_STATUS
+    return render_template('my_order.html',status=DELIVERY_STATUS)
 
 @app.route("/dasher",methods=["GET","POST"])
 def dasher():
-    global RESTURANT_ID,USER_ID, DELIVERY_STATUS,delivery_time
+    global RESTURANT_ID,USER_ID, DELIVERY_STATUS
     if request.method == "GET" :
 
         # USER_ID = 1
@@ -203,8 +231,6 @@ def dasher():
 
     elif request.method == "POST":
         DELIVERY_STATUS = "Delivered"
-        now = datetime.now()
-        delivery_time = now.strftime("%m/%d/%Y, %H:%M:%S")
         return jsonify("Success")
 
 
@@ -213,5 +239,4 @@ def dasher():
 if __name__ == "__main__":
     db.create_all()
     # app.run(debug=True, port=8081)
-    app.run(host="0.0.0.0")
-
+    app.run(host="0.0.0.0", debug=True)
