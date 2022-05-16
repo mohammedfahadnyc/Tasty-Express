@@ -1,7 +1,7 @@
 from flask import Flask, render_template, flash, redirect, url_for, session, logging, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import desc
-
+from datetime import datetime
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 db = SQLAlchemy(app)
@@ -10,6 +10,8 @@ app.secret_key = 'BAD_SECRET_KEY'
 RESTURANT_ID = 0
 USER_ID = 0
 DELIVERY_STATUS = ""
+delivery_time = ""
+
 
 class user(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -171,14 +173,14 @@ def signup():
     return render_template("signup.html")
 
 
-@app.route("/order")
+@app.route("/orders")
 def order_status():
-    global DELIVERY_STATUS
-    return render_template('my_order.html',status=DELIVERY_STATUS)
+    global DELIVERY_STATUS,today,delivery_time
+    return render_template('orders.html',status=DELIVERY_STATUS,day=delivery_time)
 
 @app.route("/dasher",methods=["GET","POST"])
 def dasher():
-    global RESTURANT_ID,USER_ID, DELIVERY_STATUS
+    global RESTURANT_ID,USER_ID, DELIVERY_STATUS,delivery_time
     if request.method == "GET" :
 
         # USER_ID = 1
@@ -201,6 +203,8 @@ def dasher():
 
     elif request.method == "POST":
         DELIVERY_STATUS = "Delivered"
+        now = datetime.now()
+        delivery_time = now.strftime("%m/%d/%Y, %H:%M:%S")
         return jsonify("Success")
 
 
