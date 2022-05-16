@@ -170,11 +170,13 @@ def table_to_lst(table):
         table_lst.append(row_to_dict(row))
     return table_lst
 
+
 @app.route("/manager.html")
 @login_required
 def manager_page():
-    return render_template("manager.html")
-    # return render_template("manager.html", table = table)
+    table = complaints.query.all()
+    return render_template("manager.html", complaints = table)
+
 
 
 @app.route("/complaints.html", methods=['POST','GET'])
