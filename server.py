@@ -17,12 +17,11 @@ class complaints(db.Model):
     cid = db.Column(db.Integer, primary_key=True)
     restaurant_name = db.Column(db.String(80))
     employee = db.Column(db.String(120))
-<<<<<<< HEAD
+
     userWarnings = db.Column(db.Integer)
     emplnumWarnings = db.Column(db.Integer)
-=======
+
     numWarnings = db.Column(db.Integer)
->>>>>>> adba21b69f4cf4e7f72ee7863036281c4211ff96
     text = db.Column(db.VARCHAR)
     username = db.Column(db.String(120))
 
