@@ -30,6 +30,9 @@ class user(db.Model):
     # username = db.Column(db.String(80))
     email = db.Column(db.String(120))
     name = db.Column(db.String(120))
+    # we should have first and last name
+    # first_name = db.Column(db.String(120))
+    # last_name = db.Column(db.String(120))
     password = db.Column(db.String(80))
     address = db.Column(db.String(80))
 
@@ -52,10 +55,18 @@ class menu(db.Model):
 
 @app.before_first_request
 def initialize():
-    session['account_type'] = "visitor"
+    #session['account_type'] = "visitor"
+    # keeping it to register_customer so we can work on everything
+    session['account_type'] = "register_customer"
+    session['user_first_name'] = "visitor"
     session['cart'] = {}
     session['total'] = 0
     session['session_rid'] = None
+
+@app.context_processor
+def base():
+    return dict(account_type=session['account_type'],
+                user_first_name=session['user_first_name'])
 
 def search(search_val):
     # currently just using a simple like filter
@@ -78,6 +89,9 @@ def index():
         top_5 = restaurant.query.order_by(desc(restaurant.rating)).limit(5).all()
         return render_template("home.html", restaurants=top_5)
 
+def format_dollar(dol_int):
+    return '${0:.2f}'.format(dol_int)
+
 def get_cost_info(cart):
     total_cost = 0.0
     for itm in cart:
@@ -88,10 +102,10 @@ def get_cost_info(cart):
     restraunt_charges = total_cost * 0.10 # 10 %
     delivery_cost = total_cost * 0.05 # 5 %
 
-    to_pay = "$" + str(sum((total_cost, delivery_cost, restraunt_charges)))
-    total_cost = "$" + str(total_cost)
-    restraunt_charges = "$" + str(restraunt_charges)
-    delivery_cost = "$" + str(delivery_cost)
+    to_pay = format_dollar(sum((total_cost, delivery_cost, restraunt_charges)))
+    total_cost = format_dollar(total_cost)
+    restraunt_charges = format_dollar(restraunt_charges)
+    delivery_cost = format_dollar(delivery_cost)
 
     return total_cost, restraunt_charges, delivery_cost, to_pay
 
@@ -225,6 +239,8 @@ def login():
         if login is not None:
             global USER_ID
             USER_ID = login.id
+            session["account_type"] = "register_customer"
+            session["user_first_name"] = login.name
             return redirect(url_for('index')) # goes to home page / and url also changes
     return render_template("login.html")
 

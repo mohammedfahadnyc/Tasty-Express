@@ -99,7 +99,11 @@
                                     </script>
                                     <div class="p-3 border-bottom gold-members">
                                         <span class="float-right pt-1 pr-2 d-flex align-items-center">
-                                          <button id="add_cart_{{ item['item_id'] }}" class="btn btn-outline-secondary btn-sm" data-target="#extras">ADD</button>
+                                          {% if account_type == "visitor" %}
+                                            <button data-toggle="modal" data-target="#exampleModal" class="btn btn-outline-secondary btn-sm" data-target="#extras">ADD</button>
+                                          {% else %}
+                                            <button id="add_cart_{{ item['item_id'] }}" class="btn btn-outline-secondary btn-sm" data-target="#extras">ADD</button>
+                                          {% endif %}
                                         </span>
                                         <div class="media">
                                             <div class="media-body">
@@ -213,153 +217,35 @@
                         {% endfor %}
                     </div>
                     <div class="bg-white p-3 clearfix border-bottom">
-                        <p class="mb-1">Item Total <span id="total-cost" class="float-right text-dark">$0.0</span></p>
-                        <p class="mb-1">Restaurant Charges <span id="restraunt-charges" class="float-right text-dark">$0.0</span></p>
-                        <p class="mb-1">Delivery Fee<span class="text-info ml-1"></span><span id="delivery-cost" class="float-right text-dark">$0.0</span></p>
+                        <p class="mb-1">Item Total <span id="total-cost" class="float-right text-dark">$0.00</span></p>
+                        <p class="mb-1">Restaurant Charges <span id="restraunt-charges" class="float-right text-dark">$0.00</span></p>
+                        <p class="mb-1">Delivery Fee<span class="text-info ml-1"></span><span id="delivery-cost" class="float-right text-dark">$0.00</span></p>
                         <!-- <p class="mb-1 text-success">Total Discount<span class="float-right text-success">$1884</span></p> -->
                         <hr>
-                        <h6 class="font-weight-bold mb-0">TOTAL <span id="to-pay" class="float-right">$0.0</span></h6>
+                        <h6 class="font-weight-bold mb-0">TOTAL <span id="to-pay" class="float-right">$0.00</span></h6>
                     </div>
                     <div class="p-3">
-                        <a class="btn btn-success btn-block btn-lg" href="{{ url_for('checkout') }}">CHECKOUT<i class="feather-arrow-right"></i></a>
+                        {% if account_type == "visitor" %}
+                          <a class="btn btn-success btn-block btn-lg" href="{{ url_for('checkout') }}" data-toggle="modal" data-target="#exampleModal">CHECKOUT<i class="feather-arrow-right"></i></a>
+                        {% else %}
+                          <a class="btn btn-success btn-block btn-lg" href="{{ url_for('checkout') }}">CHECKOUT<i class="feather-arrow-right"></i></a>
+                        {% endif %}
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <!-- <nav id="main-nav">
-        <ul class="second-nav">
-            <li><a href="home.html"><i class="feather-home mr-2"></i> Homepage</a></li>
-            <li><a href="my_order.html"><i class="feather-list mr-2"></i> My Orders</a></li>
-            <li>
-                <a href="#"><i class="feather-edit-2 mr-2"></i> Authentication</a>
-                <ul>
-                    <li><a href="login.html">Login</a></li>
-                    <li><a href="signup.html">Register</a></li>
-                    <li><a href="forgot_password.html">Forgot Password</a></li>
-                    <li><a href="verification.html">Verification</a></li>
-                    <li><a href="location.html">Location</a></li>
-                </ul>
-            </li>
-            <li><a href="favorites.html"><i class="feather-heart mr-2"></i> Favorites</a></li>
-            <li><a href="trending.html"><i class="feather-trending-up mr-2"></i> Trending</a></li>
-            <li><a href="most_popular.html"><i class="feather-award mr-2"></i> Most Popular</a></li>
-            <li><a href="restaurant.html"><i class="feather-paperclip mr-2"></i> Restaurant Detail</a></li>
-            <li><a href="checkout.html"><i class="feather-list mr-2"></i> Checkout</a></li>
-            <li><a href="successful.html"><i class="feather-check-circle mr-2"></i> Successful</a></li>
-            <li><a href="map.html"><i class="feather-map-pin mr-2"></i> Live Map</a></li>
-            <li>
-                <a href="#"><i class="feather-user mr-2"></i> Profile</a>
-                <ul>
-                    <li><a href="profile.html">Profile</a></li>
-                    <li><a href="favorites.html">Delivery support</a></li>
-                    <li><a href="contact-us.html">Contact Us</a></li>
-                    <li><a href="terms.html">Terms of use</a></li>
-                    <li><a href="privacy.html">Privacy & Policy</a></li>
-                </ul>
-            </li>
-            <li>
-                <a href="#"><i class="feather-alert-triangle mr-2"></i> Error</a>
-                <ul>
-                    <li><a href="not-found.html">Not Found</a>
-                        <li><a href="maintence.html"> Maintence</a>
-                            <li><a href="coming-soon.html">Coming Soon</a>
-                </ul>
-                </li>
-                <li>
-                    <a href="#"><i class="feather-link mr-2"></i> Navigation Link Example</a>
-                    <ul>
-                        <li>
-                            <a href="#">Link Example 1</a>
-                            <ul>
-                                <li>
-                                    <a href="#">Link Example 1.1</a>
-                                    <ul>
-                                        <li><a href="#">Link</a></li>
-                                        <li><a href="#">Link</a></li>
-                                        <li><a href="#">Link</a></li>
-                                        <li><a href="#">Link</a></li>
-                                        <li><a href="#">Link</a></li>
-                                    </ul>
-                                </li>
-                                <li>
-                                    <a href="#">Link Example 1.2</a>
-                                    <ul>
-                                        <li><a href="#">Link</a></li>
-                                        <li><a href="#">Link</a></li>
-                                        <li><a href="#">Link</a></li>
-                                        <li><a href="#">Link</a></li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </li>
-                        <li><a href="#">Link Example 2</a></li>
-                        <li><a href="#">Link Example 3</a></li>
-                        <li><a href="#">Link Example 4</a></li>
-                        <li data-nav-custom-content>
-                            <div class="custom-message">
-                                You can add any custom content to your navigation items. This text is just an example.
-                            </div>
-                        </li>
-                    </ul>
-                </li>
-        </ul>
-        <ul class="bottom-nav">
-            <li class="email">
-                <a class="text-danger" href="home.html">
-                    <p class="h5 m-0"><i class="feather-home text-danger"></i></p>
-                    Home
-                </a>
-            </li>
-            <li class="github">
-                <a href="faq.html">
-                    <p class="h5 m-0"><i class="feather-message-circle"></i></p>
-                    FAQ
-                </a>
-            </li>
-            <li class="ko-fi">
-                <a href="contact-us.html">
-                    <p class="h5 m-0"><i class="feather-phone"></i></p>
-                    Help
-                </a>
-            </li>
-        </ul>
-    </nav>
+    <!-- error popup -->
     <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Add Delivery Address</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-                  </button>
+                <div class="modal-header d-flex justify-content-center">
+                    <h5 class="modal-title">Not Signed In</h5>
                 </div>
                 <div class="modal-body">
                     <form class="">
-                        <div class="form-row">
-                            <div class="col-md-12 form-group">
-                                <label class="form-label">Delivery Area</label>
-                                <div class="input-group">
-                                    <input placeholder="Delivery Area" type="text" class="form-control">
-                                    <div class="input-group-append"><button type="button" class="btn btn-outline-secondary"><i class="feather-map-pin"></i></button></div>
-                                </div>
-                            </div>
-                            <div class="col-md-12 form-group"><label class="form-label">Complete Address</label><input placeholder="Complete Address e.g. house number, street name, landmark" type="text" class="form-control"></div>
-                            <div class="col-md-12 form-group"><label class="form-label">Delivery Instructions</label><input placeholder="Delivery Instructions e.g. Opposite Gold Souk Mall" type="text" class="form-control"></div>
-                            <div class="mb-0 col-md-12 form-group">
-                                <label class="form-label">Nickname</label>
-                                <div class="btn-group btn-group-toggle w-100" data-toggle="buttons">
-                                    <label class="btn btn-outline-secondary active">
-                              <input type="radio" name="options" id="option12" checked> Home
-                              </label>
-                                    <label class="btn btn-outline-secondary">
-                              <input type="radio" name="options" id="option22"> Work
-                              </label>
-                                    <label class="btn btn-outline-secondary">
-                              <input type="radio" name="options" id="option32"> Other
-                              </label>
-                                </div>
-                            </div>
+                        <div class="form-row py-3">
+                            <div class="col-md-12 d-flex justify-content-center"><label class="form-label">You need be signed in to order food and make payments.</label></div>
                         </div>
                     </form>
                 </div>
@@ -368,45 +254,10 @@
                         <button type="button" class="btn border-top btn-lg btn-block" data-dismiss="modal">Close</button>
                     </div>
                     <div class="col-6 m-0 p-0">
-                        <button type="button" class="btn btn-primary btn-lg btn-block">Save changes</button>
+                        <a href="{{ url_for('login') }}" role="button" class="btn btn-primary btn-lg btn-block">Sign In</a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="fahad-menu-fotter fixed-bottom bg-white px-3 py-2 text-center d-none">
-        <div class="row">
-            <div class="col selected">
-                <a href="home.html" class="text-danger small font-weight-bold text-decoration-none">
-                    <p class="h4 m-0"><i class="feather-home text-danger"></i></p>
-                    Home
-                </a>
-            </div>
-            <div class="col">
-                <a href="most_popular.html" class="text-dark small font-weight-bold text-decoration-none">
-                    <p class="h4 m-0"><i class="feather-map-pin"></i></p>
-                    Trending
-                </a>
-            </div>
-            <div class="col bg-white rounded-circle mt-n4 px-3 py-2">
-                <div class="bg-danger rounded-circle mt-n0 shadow">
-                    <a href="checkout.html" class="text-white small font-weight-bold text-decoration-none">
-                        <i class="feather-shopping-cart"></i>
-                    </a>
-                </div>
-            </div>
-            <div class="col">
-                <a href="favorites.html" class="text-dark small font-weight-bold text-decoration-none">
-                    <p class="h4 m-0"><i class="feather-heart"></i></p>
-                    Favorites
-                </a>
-            </div>
-            <div class="col">
-                <a href="profile.html" class="text-dark small font-weight-bold text-decoration-none">
-                    <p class="h4 m-0"><i class="feather-user"></i></p>
-                    Profile
-                </a>
-            </div>
-        </div>
-    </div> -->
 {% endblock %}
