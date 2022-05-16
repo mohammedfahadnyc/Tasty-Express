@@ -4,6 +4,9 @@ from flask import Flask, render_template, flash, redirect, url_for, session, log
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import desc
 
+from werkzeug.security import check_password_hash,generate_password_hash
+from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
+
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 db = SQLAlchemy(app)
@@ -13,24 +16,30 @@ RESTURANT_ID = 0
 USER_ID = 0
 DELIVERY_STATUS = ""
 
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+
 class complaints(db.Model):
     cid = db.Column(db.Integer, primary_key=True)
     restaurant_name = db.Column(db.String(80))
     employee = db.Column(db.String(120))
-<<<<<<< HEAD
+
     userWarnings = db.Column(db.Integer)
     emplnumWarnings = db.Column(db.Integer)
-=======
+
     numWarnings = db.Column(db.Integer)
->>>>>>> adba21b69f4cf4e7f72ee7863036281c4211ff96
     text = db.Column(db.VARCHAR)
     username = db.Column(db.String(120))
 
-class user(db.Model):
+class user(UserMixin,db.Model):
     id = db.Column(db.Integer, primary_key=True)
     # username = db.Column(db.String(80))
     email = db.Column(db.String(120))
     name = db.Column(db.String(120))
+    # we should have first and last name
+    # first_name = db.Column(db.String(120))
+    # last_name = db.Column(db.String(120))
     password = db.Column(db.String(80))
     address = db.Column(db.String(80))
 
@@ -51,12 +60,26 @@ class menu(db.Model):
     db.CheckConstraint('category in ("food", "drink", "dessert")', name='category_check')
 
 
+
+@login_manager.user_loader
+def load_user(user_id):
+    return user.query.get(int(user_id))
+
+
 @app.before_first_request
 def initialize():
-    session['account_type'] = "visitor"
+    # session['account_type'] = "visitor"
+    # keeping it to register_customer so we can work on everything
+    session['account_type'] = "register_customer"
+    session['user_first_name'] = "visitor"
     session['cart'] = {}
     session['total'] = 0
     session['session_rid'] = None
+
+@app.context_processor
+def base():
+    return dict(account_type=session['account_type'],
+                user_first_name=session['user_first_name'])
 
 def search(search_val):
     # currently just using a simple like filter
@@ -79,6 +102,9 @@ def index():
         top_5 = restaurant.query.order_by(desc(restaurant.rating)).limit(5).all()
         return render_template("home.html", restaurants=top_5)
 
+def format_dollar(dol_int):
+    return '${0:.2f}'.format(dol_int)
+
 def get_cost_info(cart):
     total_cost = 0.0
     for itm in cart:
@@ -89,14 +115,16 @@ def get_cost_info(cart):
     restraunt_charges = total_cost * 0.10 # 10 %
     delivery_cost = total_cost * 0.05 # 5 %
 
-    to_pay = "$" + str(sum((total_cost, delivery_cost, restraunt_charges)))
-    total_cost = "$" + str(total_cost)
-    restraunt_charges = "$" + str(restraunt_charges)
-    delivery_cost = "$" + str(delivery_cost)
+    to_pay = format_dollar(sum((total_cost, delivery_cost, restraunt_charges)))
+    total_cost = format_dollar(total_cost)
+    restraunt_charges = format_dollar(restraunt_charges)
+    delivery_cost = format_dollar(delivery_cost)
 
     return total_cost, restraunt_charges, delivery_cost, to_pay
 
+
 @app.route("/_update_cart", methods=["GET", "POST"])
+@login_required
 def update_cart():
     cart = session['cart']
     item_added_id_str = request.args.get("item_clicked_id")
@@ -143,6 +171,7 @@ def table_to_lst(table):
     return table_lst
 
 @app.route("/manager.html")
+@login_required
 def manager_page():
     return render_template("manager.html")
     # return render_template("manager.html", table = table)
@@ -155,7 +184,7 @@ def complaints_page():
         rest = request.form['rest']
         employee = request.form['employee']
         complaint = request.form['complaint']
-<<<<<<< HEAD
+# <<<<<<< HEAD
         query = complaints.query.order_by(complaints.cid.desc()).all()
         emplwarnings = 0
         if employee :
@@ -167,10 +196,10 @@ def complaints_page():
         register = complaints(username=uname, restaurant_name=rest,
                               employee=employee, text=complaint,
                               emplnumWarnings=emplwarnings)
-=======
-
-        register = complaints(username=uname, restaurant_name=rest, employee=employee, text=complaint)
->>>>>>> adba21b69f4cf4e7f72ee7863036281c4211ff96
+# =======
+#
+#         register = complaints(username=uname, restaurant_name=rest, employee=employee, text=complaint)
+# >>>>>>> adba21b69f4cf4e7f72ee7863036281c4211ff96
         db.session.add(register)
         db.session.commit()
         return render_template("home.html")
@@ -205,28 +234,67 @@ def restaurant_page():
     session['categories'] = [("Food", table_to_lst(foods)), ("Drinks", table_to_lst(drinks)), ("Desserts", table_to_lst(desserts))]
 
     return render_template("restaurant.html", restaurant_info=session['restaurant_info'],
+
                                               categories=session['categories'] )
 @app.route("/checkout.html")
+@login_required
 def checkout():
     update_cart()
     return render_template("checkout.html", restaurant_info=session['restaurant_info'],
                                             categories=session['categories'])
 
 @app.route("/successful.html")
+@login_required
 def successful():
     return render_template("successful.html")
 
+
+@app.route("/profile.html", methods=["GET", "POST"])
+@login_required
+def profile():
+    user_info = {}
+    print(request.form)
+    if request.method == "POST":
+        # get from form
+        user_info = {"first_name": request.form['user_firstname1'],
+                     "last_name": request.form['user_lastname1'],
+                     "phone": request.form['user_phoneNumber1'],
+                     "email": request.form['user_email1'],
+                     "address": request.form['user_address1']}
+    else:
+        # get from user db
+        # dummy values for now
+        user_info = {"first_name": "Firstname",
+                     "last_name": "Lastname",
+                     "phone": "1234567890",
+                     "email": "firstlast@email.com",
+                     "address": "1111 Queens blvd, NY, 11111"}
+
+    return render_template("profile.html", user_info=user_info)
+
+@app.route("/aboutus.html")
+def aboutus():
+    return render_template("aboutus.html")
+    
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
         uname = request.form["uname"]
         passw = request.form["passw"]
+        logged_in_user = user.query.filter_by(email=uname).first()
+        if not logged_in_user:
+            flash("No Accounts Associated with this email!")
+            return redirect(url_for('login'))
+        if not check_password_hash(logged_in_user.password,passw):
+            flash("Incorrect Password")
+            return redirect(url_for('login'))
+        login_user(logged_in_user)
+        global USER_ID
+        USER_ID = logged_in_user.id
+        session["account_type"] = "register_customer"
+        session["user_first_name"] = logged_in_user.name
+        return redirect(url_for('index')) # goes to home page / and url also changes
 
-        login = user.query.filter_by(email=uname, password=passw).first()
-        if login is not None:
-            global USER_ID
-            USER_ID = login.id
-            return redirect(url_for('index')) # goes to home page / and url also changes
     return render_template("login.html")
 
 
@@ -237,30 +305,45 @@ def signup():
         email = request.form['uname']
         passw = request.form['passw']
         address = request.form['address']
+        if user.query.filter_by(email=email).first():
+            flash("User Already Exists, Log in Now")
+            return redirect (url_for('login'))
 
-        register = user(name=name, email=email, password=passw,address=address)
-        db.session.add(register)
+        hashed_password = generate_password_hash(passw,method='pbkdf2:sha256', salt_length=16)
+        new_user = user(name=name, email=email, password=hashed_password,address=address)
+        db.session.add(new_user)
         db.session.commit()
-        return render_template("login.html")
+        login_user(new_user)
+        return redirect (url_for('login'))
+
     return render_template("signup.html")
+
+@app.route("/logout")
+def logout():
+    # logout_user()
+    session['account_type'] = 'visitor'
+    session['user_first_name'] = None
+    return redirect(url_for('index'))
 
 
 @app.route("/order")
+@login_required
 def order_status():
     global DELIVERY_STATUS
-<<<<<<< HEAD
-    return render_template('my_order.html',status=DELIVERY_STATUS,day=delivery_time)
+# <<<<<<< HEAD
+    return render_template('my_order.html',status=DELIVERY_STATUS)
+
 
 @app.route("/dasher",methods=["GET","POST"])
 def dasher():
     global RESTURANT_ID,USER_ID, DELIVERY_STATUS, delivery_time
-=======
-    return render_template('my_order.html',status=DELIVERY_STATUS)
-
-@app.route("/dasher",methods=["GET","POST"])
-def dasher():
-    global RESTURANT_ID,USER_ID, DELIVERY_STATUS
->>>>>>> adba21b69f4cf4e7f72ee7863036281c4211ff96
+# =======
+#     return render_template('my_order.html',status=DELIVERY_STATUS)
+#
+# @app.route("/dasher",methods=["GET","POST"])
+# def dasher():
+#     global RESTURANT_ID,USER_ID, DELIVERY_STATUS
+# >>>>>>> adba21b69f4cf4e7f72ee7863036281c4211ff96
     if request.method == "GET" :
 
         # USER_ID = 1
@@ -290,10 +373,5 @@ def dasher():
 
 if __name__ == "__main__":
     db.create_all()
-<<<<<<< HEAD
     # app.run(debug=True, port=8081)
-    app.run(host="0.0.0.0")
-=======
-    app.run(debug=True, port=8081)
-    #app.run(host="0.0.0.0")
->>>>>>> adba21b69f4cf4e7f72ee7863036281c4211ff96
+    app.run(host="0.0.0.0",debug=True)

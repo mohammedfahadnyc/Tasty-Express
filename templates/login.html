@@ -34,10 +34,21 @@
             Your browser does not support the video tag.
          </video>
         <div class="d-flex align-items-center justify-content-center vh-100">
+            <div class="box">
+        <h1>Login</h1>
+
+                </div>
             <div class="px-5 col-md-6 ml-auto">
                 <div class="px-5 col-10 mx-auto">
                     <h2 class="text-dark my-0">Welcome Back</h2>
                     <p class="text-50">Sign in to continue</p>
+                    {% with messages = get_flashed_messages() %}
+          {% if messages %}
+          {% for message in messages %}
+         <p>{{ message }}</p>
+        {% endfor %}
+      {% endif %}
+        {% endwith %}
                     <form class="mt-5 mb-4" action="{{url_for('login')}}" method="post" novalidate="True">
                         <div class="form-group">
                             <label for="exampleInputEmail1" class="text-dark">Email</label>
@@ -174,3 +185,4 @@
 </body>
 
 </html>
+
