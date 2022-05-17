@@ -228,7 +228,9 @@
                         <p class="mb-1">Item Total <span id="total-cost" class="float-right text-dark">$0.00</span></p>
                         <p class="mb-1">Restaurant Charges <span id="restraunt-charges" class="float-right text-dark">$0.00</span></p>
                         <p class="mb-1">Delivery Fee<span class="text-info ml-1"></span><span id="delivery-cost" class="float-right text-dark">$0.00</span></p>
-                        <!-- <p class="mb-1 text-success">Total Discount<span class="float-right text-success">$1884</span></p> -->
+                        {% if is_vip %}
+                          <p class="mb-1 text-success">VIP Discount Applied<span class="float-right text-success">{{VIP_DISCOUNT}}%</span></p>
+                        {% endif %}
                         <hr>
                         <h6 class="font-weight-bold mb-0">TOTAL <span id="to-pay" class="float-right">$0.00</span></h6>
                     </div>

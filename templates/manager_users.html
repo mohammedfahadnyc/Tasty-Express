@@ -40,14 +40,13 @@
                                         margin-left: 4rem;
                                         margin-bottom: 4rem;">
                  <div class="card-header">
-                   <b>User: {{user['username']}}</b>
+                   <b>User: {{user['name']}}</b>
                  </div>
                  <ul class="list-group list-group-flush">
-                   <li class="list-group-item"><b>Restaurant: </b>{{complaint['restaurant_name']}}</li>
-                   <li class="list-group-item"><b>Employee Type: </b>{{complaint['employee']}}</li>
-                   <li class="list-group-item"><b>Number of Warnings: </b>{{complaint['emplnumWarnings']}}</li>
-                   <li class="list-group-item"><b>Complaint: </b>{{complaint['text']}}</li>
-                    <button type="button" name="button">Dismiss Complaint</button>
+                   <li class="list-group-item"><b>Restaurant: </b>{{user['restaurant_name']}}</li>
+                   <li class="list-group-item"><b>Number of Warnings: </b>{{user['numWarnings']}}</li>
+                   <li class="list-group-item"><b>Category: </b>{{user['category']}}</li>
+                    <button type="button" name="button">BlackList User</button>
                  </ul>
                </div>
 
