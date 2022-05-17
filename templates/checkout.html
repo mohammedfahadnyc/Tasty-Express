@@ -125,6 +125,14 @@
                               <p class="mb-1 text-success">VIP Discount Applied<span class="float-right text-success">{{VIP_DISCOUNT}}%</span></p>
                             {% endif %}                            <hr>
                             <h6 class="font-weight-bold mb-0">TOTAL <span id="to-pay" class="float-right">$0.0</span></h6>
+                            <h6 class="font-weight-bold mb-0">Your Balance <span id="bal" class="float-right">{{balance}}</span></h6>
+                            {% with messages = get_flashed_messages() %}
+          {% if messages %}
+          {% for message in messages %}
+         <p>{{ message }}</p>
+        {% endfor %}
+      {% endif %}
+        {% endwith %}
                         </div>
                         <div class="p-3">
                             <a class="btn btn-success btn-block btn-lg" href="successful.html">PAY <i class="feather-arrow-right"></i></a>

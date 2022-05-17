@@ -20,6 +20,7 @@ DELIVERY_STATUS = ""
 delivery_time = ""
 VIP_DISCOUNT = 0.05
 DELIVERY_PERSON = ""
+BALANCE = 100
 login_manager = LoginManager()
 login_manager.init_app(app)
 
@@ -344,6 +345,8 @@ def restaurant_page():
 @app.route("/checkout.html", methods=["GET", "POST"])
 @login_required
 def checkout():
+    global BALANCE
+    # BALANCE = 100
     if request.method == "POST":
         if "user_address" in request.form:
             user_address = request.form["user_address"]
@@ -361,19 +364,26 @@ def checkout():
                                             categories=session['categories'],
                                             user_info=user_info,
                                             VIP_DISCOUNT=VIP_DISCOUNT*100,
-                                            is_vip=session['is_vip'])
+                                            is_vip=session['is_vip'],balance=BALANCE)
 
 
 @app.route("/successful.html")
 @login_required
 def successful():
+    global BALANCE
+
     new_order = order_details(rid=int(session['restaurant_info']['rid']),
                              user_id=USER_ID,
                              total_cost=session['total'])
 
     db.session.add(new_order)
     db.session.commit()
-    return render_template("successful.html")
+    if BALANCE > session['total'] :
+        BALANCE = BALANCE - session['total']
+        return render_template("successful.html")
+    else :
+        flash ("Not Enough Balance ")
+        return redirect (url_for('checkout'))
 
 
 # @app.route("/profile.html", methods=["GET", "POST"])
@@ -403,6 +413,7 @@ def successful():
 @login_required
 def profile():
     user_info = {}
+    global BALANCE
     if request.method == "POST":
         user_info = {"name": request.form['user_fullname1'],
                      "phone": request.form['user_phoneNumber1'],
@@ -416,7 +427,7 @@ def profile():
                      "email": user_info.email,
                      "address": user_info.address}
 
-    return render_template("profile.html", user_info=user_info)
+    return render_template("profile.html", user_info=user_info,balance=BALANCE)
 
 
 @app.route("/become_empl.html", methods=["GET", "POST"])
@@ -476,12 +487,12 @@ def login():
 
             if account_type == "manager":
                 return redirect(url_for('manager_page'))
-            if account_type == "delivery":
-                pass # to delivery?
-                #return redirect(url_for('delivery?'))
-            if account_type == "chef":
-                pass # to chef_page
-                #return redirect(url_for('chef_page'))
+            # if account_type == "delivery":
+            #     pass # to delivery?
+            #     #return redirect(url_for('delivery?'))
+            # if account_type == "chef":
+            #     pass # to chef_page
+            #     #return redirect(url_for('chef_page'))
 
         session["account_type"] = "register_customer"
         return redirect(url_for('index')) # goes to home page / and url also changes
