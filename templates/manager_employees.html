@@ -32,7 +32,7 @@
 
      <div class="container mt-3">
        <div class="row">
-         {% for complaint in complaints %}
+         {% for employee in employees %}
            <div class="card-deck">
 
 
@@ -40,14 +40,12 @@
                                         margin-left: 4rem;
                                         margin-bottom: 4rem;">
                  <div class="card-header">
-                   <b>User: {{complaint['username']}}</b>
+                   <b>ID #: {{employee['id']}}</b>
                  </div>
                  <ul class="list-group list-group-flush">
-                   <li class="list-group-item"><b>Restaurant: </b>{{complaint['restaurant_name']}}</li>
-                   <li class="list-group-item"><b>Employee Type: </b>{{complaint['employee']}}</li>
-                   <li class="list-group-item"><b>Number of Warnings: </b>{{complaint['emplnumWarnings']}}</li>
-                   <li class="list-group-item"><b>Complaint: </b>{{complaint['text']}}</li>
-                    <button type="button" name="button">Dismiss Complaint</button>
+                   <li class="list-group-item"><b>Category: </b>{{employee['category']}}</li>
+                   <li class="list-group-item"><b>Number of Warnings: </b>{{employee['warnings']}}</li>
+                    <button type="button" name="button">Fire Employee</button>
                  </ul>
                </div>
 

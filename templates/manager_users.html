@@ -46,7 +46,8 @@
                    <li class="list-group-item"><b>Restaurant: </b>{{user['restaurant_name']}}</li>
                    <li class="list-group-item"><b>Number of Warnings: </b>{{user['numWarnings']}}</li>
                    <li class="list-group-item"><b>Category: </b>{{user['category']}}</li>
-                    <button type="button" name="button">BlackList User</button>
+                   <a href="{{url_for('manager_black_list_user',data=user.email)}}">
+                    <button type="button" name="button" >BlackList User</button></a>
                  </ul>
                </div>
 

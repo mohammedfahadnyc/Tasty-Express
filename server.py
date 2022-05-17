@@ -127,6 +127,19 @@ def manager_users_page():
     table = user.query.all()
     return render_template("manager_users.html", users = table)
 
+@app.route("/manager_users_blacklist.html")
+def manager_black_list_user():
+    data = request.args.get('data')
+    blacklist_user = user.query.filter_by(email=data).first()
+    new_blacklist_user = black_list(email=blacklist_user.email,
+                                    name=blacklist_user.name,
+                                    address=blacklist_user.address,
+                                    phone_number=blacklist_user.phone_number)
+    db.session.add(new_blacklist_user)
+    db.session.delete(blacklist_user)
+    db.session.commit()
+    return redirect (url_for('manager_users_page'))
+
 def search(search_val):
     # currently just using a simple like filter
     # I added limit of 9 to keep the page short, but it works with no limit
