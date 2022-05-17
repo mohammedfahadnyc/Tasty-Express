@@ -236,11 +236,36 @@
                     </div>
                     <div class="p-3">
                         {% if account_type == "visitor" %}
-                          <a class="btn btn-success btn-block btn-lg" data-toggle="modal" data-target="#exampleModal">CHECKOUT<i class="feather-arrow-right"></i></a>
+                          <a class="btn btn-success btn-block btn-lg" href="" data-toggle="modal" data-target="#exampleModal">CHECKOUT<i class="feather-arrow-right"></i></a>
                         {% else %}
                           <!-- href="{{ url_for('checkout') }}" -->
                           <a id="checkoutButton" class="btn btn-success btn-block btn-lg" href="{{ url_for('checkout') }}" data-toggle="modal" data-target="#noitemsModal">CHECKOUT<i class="feather-arrow-right"></i></a>
                         {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- error popup -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header d-flex justify-content-center">
+                    <h5 class="modal-title">Not Signed In</h5>
+                </div>
+                <div class="modal-body">
+                    <form class="">
+                        <div class="form-row py-3">
+                            <div class="col-md-12 d-flex justify-content-center"><label class="form-label">You need be signed in to order food and make payments.</label></div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer p-0 border-0">
+                    <div class="col-6 m-0 p-0">
+                        <button type="button" class="btn border-top btn-lg btn-block" data-dismiss="modal">Close</button>
+                    </div>
+                    <div class="col-6 m-0 p-0">
+                        <a href="{{ url_for('login') }}" role="button" class="btn btn-primary btn-lg btn-block">Sign In</a>
                     </div>
                 </div>
             </div>

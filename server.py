@@ -270,7 +270,8 @@ def restaurant_page():
     desserts = menu.query.filter_by(rid=current_rid, category="dessert").all()
     session['categories'] = [("Food", table_to_lst(foods)), ("Drinks", table_to_lst(drinks)), ("Desserts", table_to_lst(desserts))]
 
-    user_info = user.query.filter_by(id=USER_ID).first()
+    uid = USER_ID if session['account_type'] != "visitor" else None
+    user_info = user.query.filter_by(id=uid).first()
     if user_info:
         session['is_vip'] = user_info.category == "VIP"
 
@@ -387,7 +388,7 @@ def signup():
 def logout():
     # logout_user()
     session['account_type'] = 'visitor'
-    session['user_first_name'] = None
+    session['is_vip'] = False
     return redirect(url_for('index'))
 
 
