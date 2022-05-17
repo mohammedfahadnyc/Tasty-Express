@@ -81,7 +81,7 @@ class restaurant(db.Model):
     img_path = db.Column(db.String(120))
 
 class menu(db.Model):
-    rid = db.Column(db.Integer, db.ForeignKey('restaurant.rid'), primary_key=True)
+    rid = db.Column(db.Integer, db.ForeignKey('restaurant.rid'))
     item_id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120))
     price = db.Column(db.Integer)
@@ -105,11 +105,18 @@ def initialize():
     session['total'] = 0
     session['session_rid'] = None
     session['is_vip'] = False
+    session['to_remove'] = {}
 
 @app.context_processor
 def base():
     return dict(account_type=session['account_type'],
                 user_first_name=session['user_first_name'])
+
+# Potential error page
+# @app.errorhandler(404)
+# def error_page(e):
+#     # note that we set the 404 status explicitly
+#     return render_template('not-found.html')
 
 @app.route("/manager.html")
 def manager_page():
@@ -320,6 +327,69 @@ def restaurant_page():
                                               VIP_DISCOUNT=VIP_DISCOUNT*100,
                                               is_vip=session['is_vip'])
 
+@app.route("/_chef_menu_update", methods=["GET", "POST"])
+@login_required
+def chef_menu_update():
+    to_remove = session['to_remove']
+    item_added_id_str = request.args.get("item_clicked_id")
+
+    if item_added_id_str:
+        item = menu.query.filter_by(item_id=int(item_added_id_str)).first()
+
+        if item_added_id_str in to_remove.keys():
+            to_remove.pop(item_added_id_str)
+        else:
+            to_remove[item_added_id_str] = [item.price]
+
+    session['to_remove'] = to_remove
+
+    return jsonify(to_remove=session['to_remove'],
+                   to_remove_len=len(session['to_remove']))
+
+@app.route("/chef_page.html", methods=["GET", "POST"])
+@login_required
+def chef_page():
+
+    empl_info = employee.query.filter_by(id=USER_ID).first()
+    current_rid = empl_info.rid
+
+    if empl_info.category.lower() != "chef":
+        pass #redirect(url_for('error_page'))
+
+    if request.method == "POST":
+        if request.form and request.form['item_name1']:
+            name = request.form['item_name1']
+            price = request.form['item_price_1']
+
+            if "drink_opt" in request.form:
+                category = "drink"
+            elif "dessert_opt" in request.form:
+                category = "dessert"
+            else:
+                category = "food"
+
+            # new_item = menu(rid=current_rid, name=20, price=price,category=category)
+            # db.session.add(new_item)
+            # db.session.commit()
+
+        elif session['to_remove']:
+            ids_to_rm = session['to_remove']
+            for item_id in ids_to_rm:
+                menu.query.filter_by(item_id=int(item_id)).delete()
+                db.session.commit()
+
+    session['to_remove'] = {}
+    session['restaurant_info'] = row_to_dict(restaurant.query.filter_by(rid=current_rid).first())
+
+    foods = menu.query.filter_by(rid=current_rid, category="food").all()
+    drinks = menu.query.filter_by(rid=current_rid, category="drink").all()
+    desserts = menu.query.filter_by(rid=current_rid, category="dessert").all()
+    session['categories'] = [("Food", table_to_lst(foods)), ("Drinks", table_to_lst(drinks)), ("Desserts", table_to_lst(desserts))]
+
+
+    return render_template("chef_page.html", restaurant_info=session['restaurant_info'],
+                                              categories=session['categories'])
+
 @app.route("/checkout.html", methods=["GET", "POST"])
 @login_required
 def checkout():
@@ -387,6 +457,7 @@ def profile():
                      "phone": request.form['user_phoneNumber1'],
                      "email": request.form['user_email1'],
                      "address": request.form['user_address1']}
+        # have to save data back to user db
     else:
         # get from user info db
         user_info = user.query.filter_by(id=USER_ID).first()
@@ -459,8 +530,8 @@ def login():
                 pass # to delivery?
                 #return redirect(url_for('delivery?'))
             if account_type == "chef":
-                pass # to chef_page
-                #return redirect(url_for('chef_page'))
+                # to chef_page
+                return redirect(url_for('chef_page'))
 
         session["account_type"] = "register_customer"
         return redirect(url_for('index')) # goes to home page / and url also changes
