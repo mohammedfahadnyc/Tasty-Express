@@ -102,14 +102,21 @@ def base():
     return dict(account_type=session['account_type'],
                 user_first_name=session['user_first_name'])
 
-
 @app.route("/manager.html")
-# @login_required
 def manager_page():
     table = complaints.query.all()
-    return render_template("manager.html", complaints=table)
-    #approve complaints,  update the warnings, blacklist the user
+    return render_template("manager.html", complaints = table)
+#approve complaints,  update the warnings, blacklist the user
 
+@app.route("/manager_employees.html")
+def manager_employees_page():
+    table = complaints.query.all()
+    return render_template("manager_employees.html", complaints = table)
+
+@app.route("/manager_users.html")
+def manager_users_page():
+    table = complaints.query.all()
+    return render_template("manager_users.html", complaints = table)
 
 def search(search_val):
     # currently just using a simple like filter
