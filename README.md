@@ -13,7 +13,5 @@ Final Report : https://github.com/mohammedfahadnyc/Tasty-Express/blob/main/Proje
 
 Demo here : 
 
-https://user-images.githubusercontent.com/54411378/165659535-65c313de-eead-4c8d-a66e-54fe4bd24b1c.mp4
-
-
+https://user-images.githubusercontent.com/54411378/168907789-af2a157b-eb6c-49fc-8b4e-b2bcfe6f612f.mov
 
