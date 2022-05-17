@@ -47,7 +47,9 @@
                    <li class="list-group-item"><b>Employee Type: </b>{{complaint['employee']}}</li>
                    <li class="list-group-item"><b>Number of Warnings: </b>{{complaint['emplnumWarnings']}}</li>
                    <li class="list-group-item"><b>Complaint: </b>{{complaint['text']}}</li>
-                    <button type="button" name="button">Dismiss Complaint</button>
+                   <a href="{{url_for('manager_complaints_handle',approve=True,employee=complaint['employee'])}}"><button type="button" name="button">Approve Complaint</button></a>
+                   <a href="{{url_for('manager_complaints_handle',approve=False,user=complaint['username'])}}"><button type="button" name="button">Dismiss Complaint</button></a>
+
                  </ul>
                </div>
 

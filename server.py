@@ -140,6 +140,24 @@ def manager_black_list_user():
     db.session.commit()
     return redirect (url_for('manager_users_page'))
 
+@app.route("/manager_complaints_handle.html")
+def manager_complaints_handle():
+    approval = request.args.get('approval')
+    if approval :
+        # employee = request.args.get('employee')
+        # employee_in_db = employee.query.filter_by(id=employee).first()
+        # employee_in_db.warnings += 1
+        # db.session.commit()
+        pass
+    else :
+        # user = request.args.get('user')
+        # user_in_db =  user.query.filter_by(email=user).first()
+        # user_in_db.numWarnings +=1
+        # db.session.commit()
+        pass
+    return redirect(url_for('index'))
+
+
 def search(search_val):
     # currently just using a simple like filter
     # I added limit of 9 to keep the page short, but it works with no limit
