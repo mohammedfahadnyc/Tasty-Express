@@ -15,3 +15,5 @@ Demo here :
 
 https://user-images.githubusercontent.com/54411378/168907789-af2a157b-eb6c-49fc-8b4e-b2bcfe6f612f.mov
 
+
+For Full HD Resolution , view it here : https://vimeo.com/710963449
