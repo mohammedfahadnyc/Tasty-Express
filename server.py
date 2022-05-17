@@ -392,12 +392,13 @@ def logout():
     return redirect(url_for('index'))
 
 
-@app.route("/order")
-@login_required
-def order_status():
-    global DELIVERY_STATUS
-# <<<<<<< HEAD
-    return render_template('my_order.html',status=DELIVERY_STATUS)
+# This is a dublicated order_status
+# @app.route("/order")
+# @login_required
+# def order_status():
+#     global DELIVERY_STATUS
+# # <<<<<<< HEAD
+#     return render_template('my_order.html',status=DELIVERY_STATUS)
 
 
 @app.route("/rating",methods=["GET","POST"])
