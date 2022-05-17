@@ -145,7 +145,9 @@ def get_cost_info(cart):
     restraunt_charges = total_cost * 0.10 # 10 %
     delivery_cost = total_cost * 0.05 # 5 %
 
-    to_pay = format_dollar(sum((total_cost, delivery_cost, restraunt_charges)))
+    to_pay = sum((total_cost, delivery_cost, restraunt_charges))
+    session['total'] = to_pay
+    to_pay = format_dollar(to_pay)
     total_cost = format_dollar(total_cost)
     restraunt_charges = format_dollar(restraunt_charges)
     delivery_cost = format_dollar(delivery_cost)
@@ -258,8 +260,8 @@ def restaurant_page():
     session['categories'] = [("Food", table_to_lst(foods)), ("Drinks", table_to_lst(drinks)), ("Desserts", table_to_lst(desserts))]
 
     return render_template("restaurant.html", restaurant_info=session['restaurant_info'],
-
                                               categories=session['categories'] )
+
 @app.route("/checkout.html")
 @login_required
 def checkout():
