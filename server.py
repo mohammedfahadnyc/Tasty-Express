@@ -321,21 +321,42 @@ def profile():
     user_info = {}
     if request.method == "POST":
         # get from form
-        user_info = {"first_name": request.form['user_firstname1'],
-                     "last_name": request.form['user_lastname1'],
+        user_info = {"name": request.form['user_fullname1'],
                      "phone": request.form['user_phoneNumber1'],
                      "email": request.form['user_email1'],
                      "address": request.form['user_address1']}
     else:
-        # get from user db
-        # dummy values for now
-        user_info = {"first_name": "Firstname",
-                     "last_name": "Lastname",
-                     "phone": "1234567890",
-                     "email": "firstlast@email.com",
-                     "address": "1111 Queens blvd, NY, 11111"}
+        # get from user info db
+        user_info = user.query.filter_by(id=USER_ID).first()
+        user_info = {"name": user_info.name,
+                     "phone": user_info.phone_number,
+                     "email": user_info.email,
+                     "address": user_info.address}
 
     return render_template("profile.html", user_info=user_info)
+
+@app.route("/become_empl.html", methods=["GET", "POST"])
+@login_required
+def become_empl():
+    """basic template for adding employees"""
+    user_info = user.query.filter_by(id=USER_ID).first()
+    if request.method == "POST":
+        rid = request.form['empl_rid']
+        salary = request.form['empl_rid']
+
+        if "occ_manager" in request.form:
+            category = request.form['occ_manager']
+        elif "occ_chef" in request.form:
+            category = request.form['occ_chef']
+        elif "occ_delivery" in request.form:
+            category = request.form['occ_delivery']
+        else:
+            category = request.form['occ_owner']
+
+        print(rid, salary, category)
+        return redirect(url_for('profile'))
+
+    return render_template("become_empl.html")
 
 @app.route("/aboutus.html")
 def aboutus():
