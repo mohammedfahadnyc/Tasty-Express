@@ -15,9 +15,18 @@ app.secret_key = 'BAD_SECRET_KEY'
 RESTURANT_ID = 0
 USER_ID = 0
 DELIVERY_STATUS = ""
+delivery_time = ""
 VIP_DISCOUNT = 0.05
 login_manager = LoginManager()
 login_manager.init_app(app)
+
+class black_list (db.Model):
+    black_list_id = db.Column(db.Integer,primary_key=True)
+    email = db.Column(db.String(120))
+    name = db.Column(db.String(120))
+    address = db.Column(db.String(80))
+    phone_number = db.Column(db.String(80))
+
 
 class order_details (db.Model):
     order_id = db.Column(db.Integer, primary_key=True)
@@ -270,7 +279,8 @@ def restaurant_page():
     desserts = menu.query.filter_by(rid=current_rid, category="dessert").all()
     session['categories'] = [("Food", table_to_lst(foods)), ("Drinks", table_to_lst(drinks)), ("Desserts", table_to_lst(desserts))]
 
-    user_info = user.query.filter_by(id=USER_ID).first()
+    uid = USER_ID if session['account_type'] != "visitor" else None
+    user_info = user.query.filter_by(id=uid).first()
     if user_info:
         session['is_vip'] = user_info.category == "VIP"
 
@@ -279,19 +289,21 @@ def restaurant_page():
                                               VIP_DISCOUNT=VIP_DISCOUNT*100,
                                               is_vip=session['is_vip'])
 
-@app.route("/checkout.html")
+@app.route("/checkout.html", methods=["GET", "POST"])
 @login_required
 def checkout():
+    if request.method == "POST":
+        if "user_address" in request.form:
+            user_address = request.form["user_address"]
+        elif "pm_card_num" in request.form:
+            payment_info = {"pm_card_num" : request.form["pm_card_num"],
+                            "pm_date_month" : request.form["pm_date_month"],
+                            "pm_cvv" : request.form["pm_cvv"],
+                            "pm_name" : request.form["pm_name"]}
+
+
     update_cart()
-    new_order = order_details(rid=int(session['restaurant_info']['rid']),
-                             user_id=USER_ID,
-                             total_cost=session['total'])
-
-    db.session.add(new_order)
-    db.session.commit()
-
     user_info = user.query.filter_by(id=USER_ID).first()
-
 
     return render_template("checkout.html", restaurant_info=session['restaurant_info'],
                                             categories=session['categories'],
@@ -303,31 +315,81 @@ def checkout():
 @app.route("/successful.html")
 @login_required
 def successful():
+    new_order = order_details(rid=int(session['restaurant_info']['rid']),
+                             user_id=USER_ID,
+                             total_cost=session['total'])
+
+    db.session.add(new_order)
+    db.session.commit()
     return render_template("successful.html")
+
+
+# @app.route("/profile.html", methods=["GET", "POST"])
+# @login_required
+# def profile():
+#     user_info = {}
+#     if request.method == "POST":
+#         # get from form
+#         user_info = {"first_name": request.form['user_firstname1'],
+#                      "last_name": request.form['user_lastname1'],
+#                      "phone": request.form['user_phoneNumber1'],
+#                      "email": request.form['user_email1'],
+#                      "address": request.form['user_address1']}
+#     else:
+#         # get from user db
+#         # dummy values for now
+#         user_info = {"first_name": "Firstname",
+#                      "last_name": "Lastname",
+#                      "phone": "1234567890",
+#                      "email": "firstlast@email.com",
+#                      "address": "1111 Queens blvd, NY, 11111"}
+#
+#     return render_template("profile.html", user_info=user_info)
 
 
 @app.route("/profile.html", methods=["GET", "POST"])
 @login_required
 def profile():
     user_info = {}
-    print(request.form)
     if request.method == "POST":
-        # get from form
-        user_info = {"first_name": request.form['user_firstname1'],
-                     "last_name": request.form['user_lastname1'],
+        user_info = {"name": request.form['user_fullname1'],
                      "phone": request.form['user_phoneNumber1'],
                      "email": request.form['user_email1'],
                      "address": request.form['user_address1']}
     else:
-        # get from user db
-        # dummy values for now
-        user_info = {"first_name": "Firstname",
-                     "last_name": "Lastname",
-                     "phone": "1234567890",
-                     "email": "firstlast@email.com",
-                     "address": "1111 Queens blvd, NY, 11111"}
+        # get from user info db
+        user_info = user.query.filter_by(id=USER_ID).first()
+        user_info = {"name": user_info.name,
+                     "phone": user_info.phone_number,
+                     "email": user_info.email,
+                     "address": user_info.address}
 
     return render_template("profile.html", user_info=user_info)
+
+
+@app.route("/become_empl.html", methods=["GET", "POST"])
+@login_required
+def become_empl():
+    """basic template for adding employees"""
+    user_info = user.query.filter_by(id=USER_ID).first()
+    if request.method == "POST":
+        rid = request.form['empl_rid']
+        salary = request.form['empl_rid']
+
+        if "occ_manager" in request.form:
+            category = request.form['occ_manager']
+        elif "occ_chef" in request.form:
+            category = request.form['occ_chef']
+        elif "occ_delivery" in request.form:
+            category = request.form['occ_delivery']
+        else:
+            category = request.form['occ_owner']
+
+        print(rid, salary, category)
+        return redirect(url_for('profile'))
+
+    return render_template("become_empl.html")
+
 
 @app.route("/aboutus.html")
 def aboutus():
@@ -363,6 +425,24 @@ def signup():
         passw = request.form['passw']
         address = request.form['address']
         phone = request.form['num']
+
+        #check_if_black_listed
+        email_in_black_list = black_list.query.filter_by(email=email).first()
+        address_in_black_list = black_list.query.filter_by(address=address).first()
+        name_in_black_list = black_list.query.filter_by(name=name).first()
+        phone_in_black_list = black_list.query.filter_by(phone_number=phone).first()
+
+        # if (email_in_black_list and email_in_black_list.email == email) \
+        #             or (phone_in_black_list and phone_in_black_list.phone_number ==phone) or\
+        #             ((address_in_black_list and address_in_black_list.address == address)
+        #              and
+        #              (name_in_black_list and name_in_black_list.name ==name)) :
+        if (black_list.query.filter_by(email=email).first()
+                or black_list.query.filter_by(phone_number=phone).first() or
+                (black_list.query.filter_by(address=address).first() and black_list.query.filter_by(name=name).first())):
+                flash("You Cannot use our system for prior violation.")
+                return redirect(url_for('login'))
+
         if user.query.filter_by(email=email).first():
             flash("User Already Exists, Log in Now")
             return redirect (url_for('login'))
@@ -380,16 +460,18 @@ def signup():
 def logout():
     # logout_user()
     session['account_type'] = 'visitor'
-    session['user_first_name'] = None
+    session['is_vip'] = False
     return redirect(url_for('index'))
 
 
-@app.route("/order")
-@login_required
-def order_status():
-    global DELIVERY_STATUS
-# <<<<<<< HEAD
-    return render_template('my_order.html',status=DELIVERY_STATUS)
+#This function is depreciated, use my_order() instead.
+# This is a dublicated order_status
+# @app.route("/order")
+# @login_required
+# def order_status():
+#     global DELIVERY_STATUS
+# # <<<<<<< HEAD
+#     return render_template('my_order.html',status=DELIVERY_STATUS)
 
 
 @app.route("/rating",methods=["GET","POST"])
@@ -409,7 +491,37 @@ def rating():
     if DELIVERY_STATUS == "Delivered" :
         return render_template('rating.html')
     flash("Please Wait for the delivery to start rating your order")
-    return redirect(url_for("order_status"))
+    return redirect(url_for("my_order"))
+
+#This decorator function is depreciated, use my_order() instead.
+# @app.route("/my_orderss.html")
+# def order_status():
+#     global DELIVERY_STATUS, delivery_time
+#     # <<<<<<< HEAD
+#     return render_template('my_order.html', status=DELIVERY_STATUS, day=delivery_time)
+
+
+@app.route("/status_onprocess.html")
+def status_on_process():
+    return render_template('status_onprocess.html', restaurant_info=session['restaurant_info'],
+                           categories=session['categories'])
+
+
+@app.route("/my_order.html")
+def my_order():
+    return render_template('my_order.html', restaurant_info=session['restaurant_info'],
+                           categories=session['categories'],status=DELIVERY_STATUS, day=delivery_time)
+
+
+
+@app.route("/status_complete.html")
+def status_complete():
+    return render_template('status_complete.html', restaurant_info=session['restaurant_info'],
+                           categories=session['categories'])
+
+
+
+
 
 
 @app.route("/dasher",methods=["GET","POST"])
@@ -438,7 +550,7 @@ def dasher():
             "Resturant Address" : f"{from_address}",
             "Delivery Address" : f"{to_address}",
         }
-
+        delivery_time = datetime.now()
         DELIVERY_STATUS = "Your Delivery Person Is On their Way with your order."
         return jsonify(data)
 

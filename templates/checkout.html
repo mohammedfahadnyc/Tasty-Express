@@ -17,41 +17,14 @@
                         <div class="fahad-cart-item mb-3 rounded shadow-sm bg-white overflow-hidden">
                             <div class="fahad-cart-item-profile bg-white p-3">
                                 <div class="d-flex flex-column">
-                                    <!-- <h6 class="mb-3 font-weight-bold">Delivery Address</h6> -->
-                                    <!-- <div class="row"> -->
-                                        <div class="custom-control col-lg-12 custom-radio mb-3 position-relative border-custom-radio">
-                                            <input type="radio" id="customRadioInline1" name="customRadioInline1" class="custom-control-input" checked>
-                                            <label class="custom-control-label w-100" for="customRadioInline1">
-                                       <div>
-                                          <div class="p-3 bg-white rounded shadow-sm w-100">
-                                             <div class="d-flex align-items-center mb-2">
-                                                <h6 class="mb-0">Delivery Address</h6>
-                                                <p class="mb-0 badge badge-success ml-auto"><i class="icofont-check-circled"></i> Default</p>
-                                             </div>
-                                             <p class="large text-wrap text-muted m-0" style="width: 7rem;">{{user_info.address}}</p>
-                                          </div>
-                                          <a href="#"  data-toggle="modal" data-target="#exampleModal" class="btn btn-block btn-light border-top">Edit</a>
-                                       </div>
-                                    </label>
-                                        </div>
-                                        <!-- <div class="custom-control col-lg-6 custom-radio position-relative border-custom-radio">
-                                            <input type="radio" id="customRadioInline2" name="customRadioInline1" class="custom-control-input">
-                                            <label class="custom-control-label w-100" for="customRadioInline2">
-                                       <div>
-                                          <div class="p-3 rounded bg-white shadow-sm w-100">
-                                             <div class="d-flex align-items-center mb-2">
-                                                <h6 class="mb-0">Second Address</h6>
-                                                <p class="mb-0 badge badge-light ml-auto"><i class="icofont-check-circled"></i> Select</p>
-                                             </div>
-                                             <p class="small text-muted m-0">East village, Manhattan</p>
-                                             <p class="small text-muted m-0">NY,10009</p>
-                                          </div>
-                                          <a href="#"  data-toggle="modal" data-target="#exampleModal" class="btn btn-block btn-light border-top">Edit</a>
-                                       </div>
-                                    </label>
-                                        </div> -->
-                                    <!-- </div> -->
-                                    <!-- <a class="btn btn-primary" href="#" data-toggle="modal" data-target="#exampleModal"> ADD NEW ADDRESS </a> -->
+                                    <form action="{{url_for('checkout')}}" method="post">
+                                      <h6 class="mb-3 pl-2 font-weight-bold">Delivery Address</h6>
+                                      <!-- <div class="row"> -->
+                                      <div class="col-md-12 form-group">
+                                        <input name="user_address" value="{{ user_info.address }}"  class="form-control">
+                                      </div>
+                                      <button type="submit" class="btn btn-block" style="color:white;background-color:#b91e1e;">Confirm Address</button>
+                                    </form>
                                 </div>
                             </div>
                         </div>
@@ -71,21 +44,22 @@
                                     <div class="fahad-card-body border-top p-3">
                                         <!-- <h6 class="m-0">Add new card</h6> -->
                                         <p class="small">WE ACCEPT <span class="fahad-card ml-2 font-weight-bold">( Master Card / Visa Card / Amex )</span></p>
-                                        <form>
+                                        <form action="{{url_for('checkout')}}" method="post">
                                             <div class="form-row">
                                                 <div class="col-md-12 form-group">
                                                     <label class="form-label pl-1 font-weight-bold small">Card number</label>
                                                     <div class="input-group">
-                                                        <input placeholder="Card number" class="form-control">
+                                                        <input name="pm_card_num" placeholder="Card number" class="form-control">
                                                         <div class="input-group-append"><button type="button" class="btn btn-outline-secondary"><i class="feather-credit-card"></i></button></div>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-8 form-group"><label class="form-label pl-1 font-weight-bold small">Valid through (MM/YY)</label><input placeholder="Enter Valid through (MM/YY)"  class="form-control"></div>
-                                                <div class="col-md-4 form-group"><label class="form-label pl-1 font-weight-bold small">CVV</label><input placeholder="Enter CVV Number"  class="form-control"></div>
-                                                <div class="col-md-12 form-group"><label class="form-label pl-1 font-weight-bold small">Name on card</label><input placeholder="Enter Name"  class="form-control"></div>
+                                                <div class="col-md-8 form-group"><label class="form-label pl-1 font-weight-bold small">Valid through (MM/YY)</label><input name="pm_date_month" placeholder="Enter Valid through (MM/YY)"  class="form-control"></div>
+                                                <div class="col-md-4 form-group"><label class="form-label pl-1 font-weight-bold small">CVV</label><input name="pm_cvv" placeholder="Enter CVV Number"  class="form-control"></div>
+                                                <div class="col-md-12 form-group"><label class="form-label pl-1 font-weight-bold small">Name on card</label><input name="pm_name" placeholder="Enter Name"  class="form-control"></div>
                                                 <!-- <div class="col-md-12 form-group mb-0">
                                                     <div class="custom-control custom-checkbox"><input type="checkbox" id="custom-checkbox1" class="custom-control-input"><label title="" type="checkbox" for="custom-checkbox1" class="custom-control-label small pt-1">Securely save this card for a faster checkout next time.</label></div>
                                                 </div> -->
+                                                <button type="submit" class="btn btn-block" style="color:white;background-color:#b91e1e;">Confirm Payment Info</button>
                                             </div>
                                         </form>
                                     </div>
@@ -161,7 +135,7 @@
         </div>
     </div>
     <!-- modal delivery address -->
-    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <!-- <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
@@ -170,44 +144,22 @@
                   <span aria-hidden="true">&times;</span>
                   </button>
                 </div>
-                <div class="modal-body">
-                    <form class="">
-                        <div class="form-row">
-                            <!-- <div class="col-md-12 form-group">
-                                <label class="form-label">Delivery Area</label>
-                                <div class="input-group">
-                                    <input placeholder="Delivery Area" type="text" class="form-control">
-                                    <div class="input-group-append"><button type="button" class="btn btn-outline-secondary"><i class="feather-map-pin"></i></button></div>
-                                </div>
-                            </div> -->
-                            <!-- <div class="col-md-12 form-group"><label class="form-label">Address Name</label><input placeholder="Name for this Address" type="text" class="form-control"></div> -->
-                            <div class="col-md-12 form-group"><label class="form-label">Complete Address</label><input placeholder="Complete Address e.g. house number, street name, landmark" type="text" class="form-control"></div>
-                            <!-- <div class="mb-0 col-md-12 form-group">
-                                <label class="form-label">Nickname</label>
-                                <div class="btn-group btn-group-toggle w-100" data-toggle="buttons">
-                                    <label class="btn btn-outline-secondary active">
-                              <input type="radio" name="options" id="option12" checked> Home
-                              </label>
-                                    <label class="btn btn-outline-secondary">
-                              <input type="radio" name="options" id="option22"> Work
-                              </label>
-                                    <label class="btn btn-outline-secondary">
-                              <input type="radio" name="options" id="option32"> Other
-                              </label>
-                                </div>
-                            </div> -->
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer p-0 border-0">
-                    <div class="col-6 m-0 p-0">
-                        <button type="button" class="btn border-top btn-lg btn-block" data-dismiss="modal">Close</button>
-                    </div>
-                    <div class="col-6 m-0 p-0">
-                        <button type="button" class="btn btn-primary btn-lg btn-block" data-dismiss="modal">Save changes</button>
-                    </div>
-                </div>
+                <form class="">
+                  <div class="modal-body">
+                          <div class="form-row">
+                              <div class="col-md-12 form-group"><label class="form-label">Complete Address</label><input placeholder="Complete Address e.g. house number, street name, landmark" type="text" class="form-control"></div>
+                          </div>
+                  </div>
+                  <div class="modal-footer p-0 border-0">
+                      <div class="col-6 m-0 p-0">
+                          <button type="button" class="btn border-top btn-lg btn-block" data-dismiss="modal">Close</button>
+                      </div>
+                      <div class="col-6 m-0 p-0">
+                          <button type="submit" class="btn btn-primary btn-lg btn-block" data-dismiss="modal">Save changes</button>
+                      </div>
+                  </div>
+                </form>
             </div>
         </div>
-    </div>
+    </div> -->
 {% endblock %}

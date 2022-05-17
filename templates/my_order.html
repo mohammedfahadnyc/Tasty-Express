@@ -3,20 +3,22 @@
 <!--Author URI: https://github.com/mohammedfahadnyc-->
 <!--Version: 1.0-->
 
-<!doctype html>
+<!DOCTYPE html>
+<html lang="en">
+
 {% extends 'base.html' %}
 
 {% block content %}
-
-
-    <div class="d-none">
-        <div class="bg-primary border-bottom p-3 d-flex align-items-center">
-            <a class="toggle togglew toggle-2" href="#"><span></span></a>
-            <h4 class="font-weight-bold m-0 text-white">My Order</h4>
-        </div>
-    </div>
     <section class="py-4 fahad-main-body">
         <div class="container">
+             <div class="order-body">
+                            {% with messages = get_flashed_messages() %}
+          {% if messages %}
+          {% for message in messages %}
+         <h2>{{ message }}</h2>
+        {% endfor %}
+      {% endif %}
+        {% endwith %}
             <div class="row">
                 <div class="col-md-3 mb-3">
                     <ul class="nav nav-tabsa custom-tabsa border-0 flex-column bg-white rounded overflow-hidden shadow-sm p-2 c-t-order" id="myTab" role="tablist">
@@ -30,21 +32,13 @@
                 <div class="tab-content col-md-9" id="myTabContent">
                     <div class="tab-pane fade show active" id="completed" role="tabpanel" aria-labelledby="completed-tab">
                         <div class="order-body">
-                            {% with messages = get_flashed_messages() %}
-          {% if messages %}
-          {% for message in messages %}
-         <h2>{{ message }}</h2>
-        {% endfor %}
-      {% endif %}
-        {% endwith %}
                             <div class="pb-3">
                                 <div class="p-3 rounded shadow-sm bg-white">
                                     <div class="d-flex border-bottom pb-3">
                                         <div class="text-muted mr-3">
-                                            <img alt="#" src="img/popular5.png" class="">
                                         </div>
                                         <div>
-                                            <p class="mb-0 font-weight-bold"><a href="restaurant.html" class="text-dark">Conrad Chicago Restaurant</a></p>
+                                            <p class="mb-0 font-weight-bold"><a href="restaurant.html" class="text-dark">{{ restaurant_info['name'] }}</a></p>
                                             <p class="mb-0">NewYork, USA</p>
                                             <p>ORDER #321DERS</p>
                                             <p class="mb-0 small"><a href="status_complete.html">View Details</a></p>
@@ -57,11 +51,24 @@
                                     </div>
                                     <div class="d-flex pt-3">
                                         <div class="small">
-                                            <p class="text- font-weight-bold mb-0">Fried Chicken x 1</p>
-                                            <p class="text- font-weight-bold mb-0">Mojito x 4</p>
+                                            <p class="text- font-weight-bold mb-0">Restaurant Message</p>
+                                            <p class="text- font-weight-bold mb-0">Thank You!</p>
                                         </div>
+                                        <script type=text/javascript>
+                                        $(function() {
+                                            $(document).ready( function() {
+                                                $.getJSON($SCRIPT_ROOT + '/_update_cart', {
+                                                clicked_by : "load_page"
+                                                }, function(data) {
+                                                $("#to-pay").text(data.to_pay);
+                                            });
+                                            return false;
+                                            });
+                                         });
+                                        </script>
                                         <div class="text-muted m-0 ml-auto mr-3 small">Total Payment<br>
-                                            <span class="text-dark font-weight-bold">$12.74</span>
+
+                                            <span class="text-dark font-weight-bold"><span id="to-pay" class="float-left text-dark">$0.0</span></span>
                                         </div>
                                         <div class="text-right">
                                             <a href="checkout.html" class="btn btn-primary px-3">Reorder</a>
@@ -113,7 +120,7 @@
                                             <img alt="#" src="img/popular1.png" class="img-fluid order_img rounded">
                                         </div>
                                         <div>
-                                            <p class="mb-0 font-weight-bold"><a href="restaurant.html" class="text-dark">Conrad Chicago Restaurant</a></p>
+                                            <p class="mb-0 font-weight-bold"><a href="restaurant.html" class="text-dark">Order Completed Successfully</a></p>
                                             <p class="mb-0">NewYork, USA</p>
                                             <p>ORDER #321DERS</p>
                                             <p class="mb-0 small"><a href="status_onprocess.html">View Details</a></p>
@@ -272,6 +279,7 @@
                     </div>
                 </div>
             </div>
+        </div>
         </div>
     </section>
     <!-- footer -->
@@ -553,9 +561,7 @@
     <script type="text/javascript" src="static/vendor/sidebar/hc-offcanvas-nav.js"></script>
     <!-- Custom scripts for all pages-->
     <script type="text/javascript" src="static/js/fahad.js"></script>
-    </div>
-</body>
-
-</html>
+    </html>
 
 {% endblock %}
+
