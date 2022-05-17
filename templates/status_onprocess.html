@@ -36,7 +36,7 @@
                                     <div class="fahad-status">
                                         <!-- status complete -->
                                         <div class="p-3 status-order border-bottom bg-white">
-                                            <p class="small m-0"><i class="feather-calendar text-primary"></i> 16 June, 11:30AM</p>
+                                            <p class="small m-0"><i class="feather-calendar text-primary"></i> May 17, 2022</p>
                                         </div>
                                         <div class="p-3 border-bottom">
                                             <div class="d-flex">
@@ -73,15 +73,27 @@
                                         </div>
                                         <div class="p-3 border-bottom">
                                             <p class="font-weight-bold small mb-1">Courier</p>
-                                            <img alt="#" src="img/logo_web.png" class="img-fluid sc-fahad-logo mr-2"> <span class="small text-primary font-weight-bold">Foodride Courier
+                                            <span class="small text-primary font-weight-bold">Delivery Person
                                     </span>
                                         </div>
                                         <!-- total price -->
                                         <!-- Destination -->
+                                        <script type=text/javascript>
+                                        $(function() {
+                                            $(document).ready( function() {
+                                                $.getJSON($SCRIPT_ROOT + '/_update_cart', {
+                                                clicked_by : "load_page"
+                                                }, function(data) {
+                                                $("#to-pay").text(data.to_pay);
+                                            });
+                                            return false;
+                                            });
+                                         });
+                                        </script>
                                         <div class="p-3 border-bottom bg-white">
                                             <div class="d-flex align-items-center mb-2">
                                                 <h6 class="font-weight-bold mb-1">Total Cost</h6>
-                                                <h6 class="font-weight-bold ml-auto mb-1">$</h6>
+                                                <h6 class="font-weight-bold ml-auto mb-1" id="to-pay">$0</h6>
                                             </div>
                                             <p class="m-0 small text-muted">You can check your order detail here,<br>Thank you for order.</p>
                                         </div>
