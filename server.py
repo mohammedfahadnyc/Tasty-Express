@@ -1,4 +1,6 @@
 from datetime import datetime
+import random
+
 
 from flask import Flask, render_template, flash, redirect, url_for, session, logging, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
@@ -17,6 +19,7 @@ USER_ID = 0
 DELIVERY_STATUS = ""
 delivery_time = ""
 VIP_DISCOUNT = 0.05
+DELIVERY_PERSON = ""
 login_manager = LoginManager()
 login_manager.init_app(app)
 
@@ -144,18 +147,30 @@ def manager_black_list_user():
 def manager_complaints_handle():
     approval = request.args.get('approval')
     if approval :
-        # employee = request.args.get('employee')
-        # employee_in_db = employee.query.filter_by(id=employee).first()
-        # employee_in_db.warnings += 1
-        # db.session.commit()
-        pass
+        employee = request.args.get('employee')
+        employee_in_db = employee.query.filter_by(category=employee).first()
+        employee_in_cmpln_db = complaints.query.filter_by(employee=employee).first()
+        if not employee_in_db.warnings :
+            employee_in_db.warnings = 0
+        employee_in_db.warnings += 1
+        if not employee_in_cmpln_db.emplnumWarnings :
+            employee_in_cmpln_db.emplnumWarnings
+        employee_in_cmpln_db.emplnumWarnings +=1
+        db.session.commit()
+
     else :
-        # user = request.args.get('user')
-        # user_in_db =  user.query.filter_by(email=user).first()
-        # user_in_db.numWarnings +=1
-        # db.session.commit()
-        pass
-    return redirect(url_for('index'))
+        user = request.args.get('user')
+        user_in_db =  user.query.filter_by(email=user).first()
+        if not user_in_db.numWarnings:
+            user_in_db.numWarnings=0
+        user_in_db.numWarnings +=1
+        user_in_cmpln_db = complaints.query.filter_by(username=user).first()
+        if not user_in_cmpln_db.userWarnings:
+            user_in_cmpln_db.userWarnings = 0
+        user_in_cmpln_db.userWarnings +=1
+        db.session.commit()
+
+    return redirect(url_for('manager_page'))
 
 
 def search(search_val):
@@ -256,8 +271,10 @@ def table_to_lst(table):
 
 @app.route("/complaints.html", methods=['POST','GET'])
 def complaints_page():
+    global DELIVERY_PERSON
     if request.method == "POST":
-        uname = request.form['uname']
+        if current_user.email :
+            uname = request.form['uname']
         rest = request.form['rest']
         employee = request.form['employee']
         complaint = request.form['complaint']
@@ -281,7 +298,11 @@ def complaints_page():
         db.session.commit()
         return render_template("home.html")
     else:
-        return render_template("complaints.html")
+        user_email = ""
+        if current_user.email :
+            user_email = current_user.email
+
+        return render_template("complaints.html",delivery_person=DELIVERY_PERSON,user_email=user_email)
 
 
 @app.route("/restaurant.html")
@@ -441,8 +462,28 @@ def login():
         login_user(logged_in_user)
         global USER_ID
         USER_ID = logged_in_user.id
-        session["account_type"] = "register_customer"
         session["user_first_name"] = logged_in_user.name
+
+        user_empl = employee.query.filter_by(id=USER_ID).first()
+        if user_empl:
+            # made lowercase
+            account_type = user_empl.category.lower()
+            session["account_type"] = account_type
+
+            # if we stay consisten with out definition of category with pages
+            # we can do this:
+            # return redirect(url_for(account_type))
+
+            if account_type == "manager":
+                return redirect(url_for('manager_page'))
+            if account_type == "delivery":
+                pass # to delivery?
+                #return redirect(url_for('delivery?'))
+            if account_type == "chef":
+                pass # to chef_page
+                #return redirect(url_for('chef_page'))
+
+        session["account_type"] = "register_customer"
         return redirect(url_for('index')) # goes to home page / and url also changes
 
     return render_template("login.html")
@@ -534,8 +575,13 @@ def rating():
 
 @app.route("/status_onprocess.html")
 def status_on_process():
+    global DELIVERY_PERSON
+    delivery_person = employee.query.all()
+    delivery_person = random.choice(delivery_person).category
+    DELIVERY_PERSON = delivery_person
+    user_info = user.query.filter_by(id=USER_ID).first()
     return render_template('status_onprocess.html', restaurant_info=session['restaurant_info'],
-                           categories=session['categories'])
+                           categories=session['categories'], user_info=user_info,delivery_person=DELIVERY_PERSON)
 
 
 @app.route("/my_order.html")
@@ -547,8 +593,9 @@ def my_order():
 
 @app.route("/status_complete.html")
 def status_complete():
+    user_info = user.query.filter_by(id=USER_ID).first()
     return render_template('status_complete.html', restaurant_info=session['restaurant_info'],
-                           categories=session['categories'])
+                           categories=session['categories'], user_info=user_info)
 
 
 
