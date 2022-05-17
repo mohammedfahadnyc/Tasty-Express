@@ -15,7 +15,7 @@ app.secret_key = 'BAD_SECRET_KEY'
 RESTURANT_ID = 0
 USER_ID = 0
 DELIVERY_STATUS = ""
-VIP_DISCOUNT = 5
+VIP_DISCOUNT = 0.05
 login_manager = LoginManager()
 login_manager.init_app(app)
 
@@ -95,6 +95,7 @@ def initialize():
     session['cart'] = {}
     session['total'] = 0
     session['session_rid'] = None
+    session['is_vip'] = False
 
 @app.context_processor
 def base():
@@ -145,13 +146,16 @@ def get_cost_info(cart):
     restraunt_charges = total_cost * 0.10 # 10 %
     delivery_cost = total_cost * 0.05 # 5 %
 
-    to_pay = sum((total_cost, delivery_cost, restraunt_charges))
+
+    #add vip discount
+    vip_discount = (1-VIP_DISCOUNT) if session['is_vip'] else 1
+    to_pay = sum((total_cost, delivery_cost, restraunt_charges)) * vip_discount
+
     session['total'] = to_pay
     to_pay = format_dollar(to_pay)
     total_cost = format_dollar(total_cost)
     restraunt_charges = format_dollar(restraunt_charges)
     delivery_cost = format_dollar(delivery_cost)
-    #add vip discount
 
     return total_cost, restraunt_charges, delivery_cost, to_pay
 
@@ -259,8 +263,14 @@ def restaurant_page():
     desserts = menu.query.filter_by(rid=current_rid, category="dessert").all()
     session['categories'] = [("Food", table_to_lst(foods)), ("Drinks", table_to_lst(drinks)), ("Desserts", table_to_lst(desserts))]
 
+    user_info = user.query.filter_by(id=USER_ID).first()
+    if user_info:
+        session['is_vip'] = user_info.category == "VIP"
+
     return render_template("restaurant.html", restaurant_info=session['restaurant_info'],
-                                              categories=session['categories'] )
+                                              categories=session['categories'],
+                                              VIP_DISCOUNT=VIP_DISCOUNT*100,
+                                              is_vip=session['is_vip'])
 
 @app.route("/checkout.html")
 @login_required
@@ -278,7 +288,9 @@ def checkout():
 
     return render_template("checkout.html", restaurant_info=session['restaurant_info'],
                                             categories=session['categories'],
-                                            user_info=user_info)
+                                            user_info=user_info,
+                                            VIP_DISCOUNT=VIP_DISCOUNT*100,
+                                            is_vip=session['is_vip'])
 
 
 @app.route("/successful.html")
