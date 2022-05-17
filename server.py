@@ -418,6 +418,30 @@ def rating():
     flash("Please Wait for the delivery to start rating your order")
     return redirect(url_for("order_status"))
 
+@app.route("/orders.html")
+def order_status():
+    global DELIVERY_STATUS
+    # <<<<<<< HEAD
+    return render_template('my_orders.html', status=DELIVERY_STATUS, day=delivery_time)
+
+
+@app.route("/status_onprocess.html")
+def status_on_process():
+    return render_template('status_onprocess.html', restaurant_info=session['restaurant_info'],
+                           categories=session['categories'])
+
+
+@app.route("/my_order.html")
+def my_order():
+    return render_template('my_order.html', restaurant_info=session['restaurant_info'],
+                           categories=session['categories'])
+
+
+@app.route("/status_complete.html")
+def status_complete():
+    return render_template('status_complete.html', restaurant_info=session['restaurant_info'],
+                           categories=session['categories'])
+
 
 @app.route("/dasher",methods=["GET","POST"])
 def dasher():
