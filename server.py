@@ -20,8 +20,10 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 
 class order_details (db.Model):
-    rid = db.Column(db.Integer,db.ForeignKey('restaurant.rid'), primary_key=True)
-    user_id = db.Column(db.Integer,db.ForeignKey('user.id'), primary_key=True)
+    order_id = db.Column(db.Integer, primary_key=True)
+    rid = db.Column(db.Integer,db.ForeignKey('restaurant.rid'))
+    user_id = db.Column(db.Integer,db.ForeignKey('user.id'))
+    delivery_id = db.Column(db.Integer,db.ForeignKey('user.id'))
     total_cost = db.Column(db.String(120))
 
 
@@ -88,8 +90,8 @@ def load_user(user_id):
 def initialize():
     # session['account_type'] = "visitor"
     # keeping it to register_customer so we can work on everything
-    session['account_type'] = "register_customer"
-    session['user_first_name'] = "visitor"
+    session['account_type'] = "visitor"
+    session['user_first_name'] = None
     session['cart'] = {}
     session['total'] = 0
     session['session_rid'] = None
@@ -100,13 +102,23 @@ def base():
                 user_first_name=session['user_first_name'])
 
 
+
+
 @app.route("/manager.html")
-# @login_required
 def manager_page():
     table = complaints.query.all()
-    return render_template("manager.html", complaints=table)
-    #approve complaints,  update the warnings, blacklist the user
+    return render_template("manager.html", complaints = table)
+#approve complaints,  update the warnings, blacklist the user
 
+@app.route("/manager_employees.html")
+def manager_employees_page():
+    table = complaints.query.all()
+    return render_template("manager_employees.html", complaints = table)
+
+@app.route("/manager_users.html")
+def manager_users_page():
+    table = complaints.query.all()
+    return render_template("manager_users.html", complaints = table)
 
 def search(search_val):
     # currently just using a simple like filter
@@ -143,7 +155,9 @@ def get_cost_info(cart):
     restraunt_charges = total_cost * 0.10 # 10 %
     delivery_cost = total_cost * 0.05 # 5 %
 
-    to_pay = format_dollar(sum((total_cost, delivery_cost, restraunt_charges)))
+    to_pay = sum((total_cost, delivery_cost, restraunt_charges))
+    session['total'] = to_pay
+    to_pay = format_dollar(to_pay)
     total_cost = format_dollar(total_cost)
     restraunt_charges = format_dollar(restraunt_charges)
     delivery_cost = format_dollar(delivery_cost)
@@ -177,8 +191,6 @@ def update_cart():
 
     session['cart'] = cart
     total_cost, restraunt_charges, delivery_cost, to_pay = get_cost_info(cart)
-
-    print(session['cart'])
 
     return jsonify(cart=session['cart'],
                    cart_len=len(session['cart']),
@@ -258,14 +270,25 @@ def restaurant_page():
     session['categories'] = [("Food", table_to_lst(foods)), ("Drinks", table_to_lst(drinks)), ("Desserts", table_to_lst(desserts))]
 
     return render_template("restaurant.html", restaurant_info=session['restaurant_info'],
-
                                               categories=session['categories'] )
+
 @app.route("/checkout.html")
 @login_required
 def checkout():
     update_cart()
+    new_order = order_details(rid=int(session['restaurant_info']['rid']),
+                             user_id=USER_ID,
+                             total_cost=session['total'])
+
+    db.session.add(new_order)
+    db.session.commit()
+
+    user_info = user.query.filter_by(id=USER_ID).first()
+
+
     return render_template("checkout.html", restaurant_info=session['restaurant_info'],
-                                            categories=session['categories'])
+                                            categories=session['categories'],
+                                            user_info=user_info)
 
 
 @app.route("/successful.html")
@@ -300,7 +323,7 @@ def profile():
 @app.route("/aboutus.html")
 def aboutus():
     return render_template("aboutus.html")
-    
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":

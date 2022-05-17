@@ -69,12 +69,12 @@
                                       </div>
                                       <div class="p-3 position-relative">
                                           <div class="list-card-body">
-                                              <h6 class="mb-1"><a href="{{url_for('restaurant_page', rid=restaurant['rid'])}}" class="text-black">{{restaurant['name']}}
+                                              <h6 class="mb-1 pl-2"><a href="{{url_for('restaurant_page', rid=restaurant['rid'])}}" class="text-black">{{restaurant['name']}}
                                                 </a>
                                               </h6>
                                               <div class="list-card-body">
-                                                    <h6 class="mb-1"><a href="restaurant.html" class="text-gray font-weight-light">Sub-Heading</a></h6>
-                                                    <p class="text-gray mb-3">Category1 • Category2 • Category3</p>
+                                                    <!-- <h6 class="mb-1"><a href="restaurant.html" class="text-gray font-weight-light">Sub-Heading</a></h6> -->
+                                                    <p class="text-gray mb-3 pl-2">{{ restaurant['category'] }}</p>
                                               </div>
                                           </div>
                                           <!-- <div class="list-card-badge">
@@ -101,31 +101,6 @@
             </div>
         </div>
     </div>
-    <!-- Footer -->
-     <footer class="section-footer border-top bg-dark mt-5">
-        <div class="container">
-            <section class="footer-top d-flex align-items-center justify-content-center padding-y py-4">
-                  <aside class="text-right text-white mr-4">
-                      <p class="mb-1 text-light">CSC 322 - Software Engineering</p>
-                      <p class="mb-1 text-light">Professor Jie Wei Project</p>
-                      <p class="mb-1 text-light">City College of New York</p>
-                  </aside>
-                  <aside class="col-sm-10 col-md-2 text-white">
-                      <ul class="list-unstyled hov_footer">
-                          <li> <a href="/" class="text-muted">Home</a></li>
-                          <li> <a href="contact.html" class="text-muted">Contact</a></li>
-                          <li> <a href="about-us.html" class="text-muted">About Us</a></li>
-                      </ul>
-                  </aside>
-            </section>
-        </div>
-        <!-- //container -->
-        <section class="footer-copyright border-top py-3 bg-light">
-            <div class="container d-flex align-items-center justify-content-center">
-                <p class="mb-0"> © 2022 Tasty Express  All rights reserved </p>
-            </div>
-        </section>
-    </footer>
     <!-- <nav id="main-nav">
         <ul class="second-nav">
             <li><a href="home.html"><i class="feather-home mr-2"></i> Homepage</a></li>
