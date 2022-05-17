@@ -1,18 +1,19 @@
 # Tasty-Express
 
-To get started with the front end files, make sure you switch the branch to fahad-04-27...
+Full Fledged Food Delivery System - Project For Software Engineering Spring 2022 Class
+Full Specification, Phase Reports and Demo Can be Found Here :
 
-Initial Commit - First Draft Front End,complete CSS HTML files uploaded. For FrontEnd, Boostrap is being used, this website has support for complete responsive design. 
- Heads up for other contributors - 
- 
- Front End - Feel Free to add/remove/edit web pages, be sure to use classnames from the css file or add your class to the css file. Most of the images are 
- blank and servs as only placeholder, so feel free to add images to the img resource and make sure to rename your image to existing blank image and delete the existing blank image afterwards.
- 
- 
- Bakcend - As of now, we're planning to use flask, so get started with flask, make sure to move all the html files to a templates folder and css/js(ie all other files) to a static folder. Start your flask server and set the home route to "home.html".
+Full Specification :  (https://github.com/mohammedfahadnyc/Tasty-Express/files/8711423/Project.Specification.pdf)
 
+Phase 1 Report : (https://github.com/mohammedfahadnyc/Tasty-Express/files/8711427/TastyExpress_spec_d1.pdf)
+
+Phase 2 Repot :  (https://github.com/mohammedfahadnyc/Tasty-Express/files/8711428/TastyExpress_Phase_2.pdf)
+
+Final Report : (https://github.com/mohammedfahadnyc/Tasty-Express/files/8711432/Final.Project.Report.pdf)
 
 Demo here : 
 
 https://user-images.githubusercontent.com/54411378/165659535-65c313de-eead-4c8d-a66e-54fe4bd24b1c.mp4
+
+
 
