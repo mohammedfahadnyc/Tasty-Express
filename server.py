@@ -279,19 +279,21 @@ def restaurant_page():
                                               VIP_DISCOUNT=VIP_DISCOUNT*100,
                                               is_vip=session['is_vip'])
 
-@app.route("/checkout.html")
+@app.route("/checkout.html", methods=["GET", "POST"])
 @login_required
 def checkout():
+    if request.method == "POST":
+        if "user_address" in request.form:
+            user_address = request.form["user_address"]
+        elif "pm_card_num" in request.form:
+            payment_info = {"pm_card_num" : request.form["pm_card_num"],
+                            "pm_date_month" : request.form["pm_date_month"],
+                            "pm_cvv" : request.form["pm_cvv"],
+                            "pm_name" : request.form["pm_name"]}
+
+
     update_cart()
-    new_order = order_details(rid=int(session['restaurant_info']['rid']),
-                             user_id=USER_ID,
-                             total_cost=session['total'])
-
-    db.session.add(new_order)
-    db.session.commit()
-
     user_info = user.query.filter_by(id=USER_ID).first()
-
 
     return render_template("checkout.html", restaurant_info=session['restaurant_info'],
                                             categories=session['categories'],
@@ -303,6 +305,12 @@ def checkout():
 @app.route("/successful.html")
 @login_required
 def successful():
+    new_order = order_details(rid=int(session['restaurant_info']['rid']),
+                             user_id=USER_ID,
+                             total_cost=session['total'])
+
+    db.session.add(new_order)
+    db.session.commit()
     return render_template("successful.html")
 
 
@@ -310,7 +318,6 @@ def successful():
 @login_required
 def profile():
     user_info = {}
-    print(request.form)
     if request.method == "POST":
         # get from form
         user_info = {"first_name": request.form['user_firstname1'],
