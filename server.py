@@ -441,8 +441,28 @@ def login():
         login_user(logged_in_user)
         global USER_ID
         USER_ID = logged_in_user.id
-        session["account_type"] = "register_customer"
         session["user_first_name"] = logged_in_user.name
+
+        user_empl = employee.query.filter_by(id=USER_ID).first()
+        if user_empl:
+            # made lowercase
+            account_type = user_empl.category.lower()
+            session["account_type"] = account_type
+
+            # if we stay consisten with out definition of category with pages
+            # we can do this:
+            # return redirect(url_for(account_type))
+
+            if account_type == "manager":
+                return redirect(url_for('manager_page'))
+            if account_type == "delivery":
+                pass # to delivery?
+                #return redirect(url_for('delivery?'))
+            if account_type == "chef":
+                pass # to chef_page
+                #return redirect(url_for('chef_page'))
+
+        session["account_type"] = "register_customer"
         return redirect(url_for('index')) # goes to home page / and url also changes
 
     return render_template("login.html")
@@ -598,4 +618,3 @@ if __name__ == "__main__":
     db.create_all()
     # app.run(debug=True, port=8081)
     app.run(host="0.0.0.0",debug=True)
-
