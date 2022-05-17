@@ -90,8 +90,8 @@ def load_user(user_id):
 def initialize():
     # session['account_type'] = "visitor"
     # keeping it to register_customer so we can work on everything
-    session['account_type'] = "register_customer"
-    session['user_first_name'] = "visitor"
+    session['account_type'] = "visitor"
+    session['user_first_name'] = None
     session['cart'] = {}
     session['total'] = 0
     session['session_rid'] = None
@@ -272,8 +272,13 @@ def checkout():
 
     db.session.add(new_order)
     db.session.commit()
+
+    user_info = user.query.filter_by(id=USER_ID).first()
+
+
     return render_template("checkout.html", restaurant_info=session['restaurant_info'],
-                                            categories=session['categories'])
+                                            categories=session['categories'],
+                                            user_info=user_info)
 
 
 @app.route("/successful.html")

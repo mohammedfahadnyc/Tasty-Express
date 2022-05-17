@@ -34,7 +34,7 @@
                       <input class="form-control" type="text" name="search_val" value="{{ request.args['search_val'] }}"
                       style="border-radius:25px;height:47px;font-size:16px;padding-left:25px;" placeholder="Search for Restaurants">
                     <div class="input-group-prepend pl-2">
-                      <button class="btn btn-primary" style="border-radius:25px;height:50px;width:70px;font-size:16px">
+                      <button class="btn btn-primary" style="border-radius:25px;height:50px;width:70px;font-size:16px;">
                         <i class="feather-search h5"></i>
                       </button>
                     </div>
@@ -83,7 +83,7 @@
                               <a href="{{url_for('restaurant_page', rid=restaurant['rid'])}}" class="text-black">{{ restaurant['name'] }}</a>
                         </div>
                         <div class="list-card-body">
-                              <h6 class="mb-2"><t class="text-gray font-weight-light">Sub-Heading</t></h6>
+                              <!-- <h6 class="mb-2"><t class="text-gray font-weight-light">Sub-Heading</t></h6> -->
                               <p class="text-gray mb-2">{{ restaurant['category'] }}</p>
                         </div>
                     </div>

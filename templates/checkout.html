@@ -17,7 +17,7 @@
                         <div class="fahad-cart-item mb-3 rounded shadow-sm bg-white overflow-hidden">
                             <div class="fahad-cart-item-profile bg-white p-3">
                                 <div class="d-flex flex-column">
-                                    <h6 class="mb-3 font-weight-bold">Delivery Address</h6>
+                                    <!-- <h6 class="mb-3 font-weight-bold">Delivery Address</h6> -->
                                     <!-- <div class="row"> -->
                                         <div class="custom-control col-lg-12 custom-radio mb-3 position-relative border-custom-radio">
                                             <input type="radio" id="customRadioInline1" name="customRadioInline1" class="custom-control-input" checked>
@@ -25,11 +25,10 @@
                                        <div>
                                           <div class="p-3 bg-white rounded shadow-sm w-100">
                                              <div class="d-flex align-items-center mb-2">
-                                                <h6 class="mb-0">Home</h6>
+                                                <h6 class="mb-0">Delivery Address</h6>
                                                 <p class="mb-0 badge badge-success ml-auto"><i class="icofont-check-circled"></i> Default</p>
                                              </div>
-                                             <p class="small text-muted m-0">1001 Veterans Blvd</p>
-                                             <p class="small text-muted m-0">Radio City, NY 10009</p>
+                                             <p class="large text-wrap text-muted m-0" style="width: 7rem;">{{user_info.address}}</p>
                                           </div>
                                           <a href="#"  data-toggle="modal" data-target="#exampleModal" class="btn btn-block btn-light border-top">Edit</a>
                                        </div>
@@ -60,9 +59,11 @@
                             <div class="fahad-card bg-white border-bottom overflow-hidden">
                                 <div class="fahad-card-header" id="headingOne">
                                     <h2 class="mb-0">
-                                        <button class="d-flex p-3 align-items-center btn btn-link w-100" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                        <!-- dont collapse -->
+                                        <!-- data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne" -->
+                                        <button class="d-flex p-3 align-items-center btn btn-link w-100" type="button">
                                  <i class="feather-credit-card mr-3"></i> Credit/Debit Card
-                                 <i class="feather-chevron-down ml-auto"></i>
+                                 <!-- <i class="feather-chevron-down ml-auto"></i> -->
                                  </button>
                                     </h2>
                                 </div>
@@ -79,7 +80,7 @@
                                                         <div class="input-group-append"><button type="button" class="btn btn-outline-secondary"><i class="feather-credit-card"></i></button></div>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-8 form-group"><label class="form-label pl-1 font-weight-bold small">Valid through (MM/YY)</label><input placeholder="Enter Valid through(MM/YY)"  class="form-control"></div>
+                                                <div class="col-md-8 form-group"><label class="form-label pl-1 font-weight-bold small">Valid through (MM/YY)</label><input placeholder="Enter Valid through (MM/YY)"  class="form-control"></div>
                                                 <div class="col-md-4 form-group"><label class="form-label pl-1 font-weight-bold small">CVV</label><input placeholder="Enter CVV Number"  class="form-control"></div>
                                                 <div class="col-md-12 form-group"><label class="form-label pl-1 font-weight-bold small">Name on card</label><input placeholder="Enter Name"  class="form-control"></div>
                                                 <!-- <div class="col-md-12 form-group mb-0">
@@ -90,7 +91,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="fahad-card bg-white overflow-hidden">
+                            <!-- <div class="fahad-card bg-white overflow-hidden">
                                 <div class="fahad-card-header" id="headingThree">
                                     <h2 class="mb-0">
                                         <button class="d-flex p-3 align-items-center btn btn-link w-100" type="button" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
@@ -105,7 +106,7 @@
                                         <p class="m-0">Please keep exact change handy to help us serve you better</p>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
                         </div>
                     </div>
                 </div>
@@ -178,7 +179,7 @@
                                     <div class="input-group-append"><button type="button" class="btn btn-outline-secondary"><i class="feather-map-pin"></i></button></div>
                                 </div>
                             </div> -->
-                            <div class="col-md-12 form-group"><label class="form-label">Address Name</label><input placeholder="Name for this Address" type="text" class="form-control"></div>
+                            <!-- <div class="col-md-12 form-group"><label class="form-label">Address Name</label><input placeholder="Name for this Address" type="text" class="form-control"></div> -->
                             <div class="col-md-12 form-group"><label class="form-label">Complete Address</label><input placeholder="Complete Address e.g. house number, street name, landmark" type="text" class="form-control"></div>
                             <!-- <div class="mb-0 col-md-12 form-group">
                                 <label class="form-label">Nickname</label>
