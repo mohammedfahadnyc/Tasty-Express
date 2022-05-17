@@ -534,8 +534,9 @@ def rating():
 
 @app.route("/status_onprocess.html")
 def status_on_process():
+    user_info = user.query.filter_by(id=USER_ID).first()
     return render_template('status_onprocess.html', restaurant_info=session['restaurant_info'],
-                           categories=session['categories'])
+                           categories=session['categories'], user_info=user_info)
 
 
 @app.route("/my_order.html")
@@ -547,8 +548,9 @@ def my_order():
 
 @app.route("/status_complete.html")
 def status_complete():
+    user_info = user.query.filter_by(id=USER_ID).first()
     return render_template('status_complete.html', restaurant_info=session['restaurant_info'],
-                           categories=session['categories'])
+                           categories=session['categories'], user_info=user_info)
 
 
 
@@ -596,3 +598,4 @@ if __name__ == "__main__":
     db.create_all()
     # app.run(debug=True, port=8081)
     app.run(host="0.0.0.0",debug=True)
+
