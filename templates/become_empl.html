@@ -1,0 +1,59 @@
+<!doctype html>
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="fahad-profile">
+      <div class="d-none">
+          <div class="bg-primary border-bottom p-3 d-flex align-items-center">
+              <a class="toggle togglew toggle-2" href="#"><span></span></a>
+              <h4 class="font-weight-bold m-0 text-white">Profile</h4>
+          </div>
+      </div>
+      <!-- profile -->
+      <div class="container position-relative">
+          <div class="py-5 fahad-profile row d-flex justify-content-center">
+              <div class="col-md-1 mb-3 d-none"></div>
+              <div class="col-md-8 mb-3">
+                  <div class="rounded shadow-sm p-4 bg-white">
+                      <h5 class="mb-4">Become an Employee</h5>
+                      <div id="edit_profile">
+                          <div>
+                              <form action="{{ url_for('become_empl') }}" method="post">
+                                  <div class="form-group">
+                                      <label for="user_firstname1">Restaurant ID</label>
+                                      <input type="text" class="form-control" name="empl_rid" id="empl_rid" placeholder="Enter rid">
+                                  </div>
+                                  <div class="form-group">
+                                      <label for="user_phoneNumber1">Salary</label>
+                                      <input type="text" class="form-control" name="empl_salary" id="empl_salary" placeholder="Enter Salary">
+                                  </div>
+
+                                  <div class="mb-0 col-md-12 form-group">
+                                      <label class="form-label">Occupation</label>
+                                      <div class="btn-group btn-group-toggle w-100" data-toggle="buttons">
+                                          <label class="btn btn-outline-secondary active">
+                                            <input type="radio" name="occ_manager" id="occ_manager" checked> Manager
+                                          </label>
+                                          <label class="btn btn-outline-secondary">
+                                            <input type="radio" name="occ_chef" id="occ_chef"> Chef
+                                          </label>
+                                          <label class="btn btn-outline-secondary">
+                                            <input type="radio" name="occ_delivery" id="occ_delivery"> Delivery
+                                          </label>
+                                          <label class="btn btn-outline-secondary">
+                                            <input type="radio" name="occ_owner" id="occ_owner"> Owner
+                                          </label>
+                                      </div>
+                                  </div>
+
+                                  <div class="text-center pt-3">
+                                      <button type="submit" class="btn btn-primary btn-block">Confirm</button>
+                                  </div>
+                              </form>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+{% endblock %}
