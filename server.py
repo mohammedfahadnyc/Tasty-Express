@@ -115,8 +115,8 @@ def manager_employees_page():
 
 @app.route("/manager_users.html")
 def manager_users_page():
-    table = complaints.query.all()
-    return render_template("manager_users.html", complaints = table)
+    table = user.query.all()
+    return render_template("manager_users.html", users = table)
 
 def search(search_val):
     # currently just using a simple like filter
