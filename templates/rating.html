@@ -1,0 +1,48 @@
+<!doctype html>
+{% extends 'base.html' %}
+{% block content %}
+
+
+<div class="d-flex align-items-center justify-content-center flex-column vh-100">
+    <div class="px-5 col-md-6 ml-auto">
+        <div class="px-5 col-10 mx-auto">
+            <h2 class="text-dark my-0">Ratings For Your Order</h2>
+            <!-- <p class="text-50">Sign up to continue</p> -->
+            <form class="mt-5 mb-4" action="{{url_for('rating')}}" method="post">
+
+                <div class="form-group">
+                    <label class="text-dark">Restarurant Name</label>
+
+                </div>
+                <div class="form-group">
+                    <label  class="text-dark">Delivery Driver or Chef</label>
+
+                </div>
+<!--                 <div class="form-group">-->
+<!--                    <label for="rating" class="text-dark">Rate Your Order Out Of 5</label>-->
+<!--                    <input name="rating" id="rating" type="number" placeholder="4.5" class="form-control" >-->
+<!--                </div>-->
+                <label class="text-dark" for="rating">Choose a rating:</label>
+  <select id="rating" name="rating">
+    <option value="1">1</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+    <option value="4">4</option>
+      <option value="5">5</option>
+  </select>
+<!--                <div class="form-group">-->
+<!--                    <label for="exampleInputPassword1" class="text-dark">Complaint</label>-->
+<!--                    <input name="complaint" id="complaint" type="text" placeholder="Enter Your Complaint Here" class="form-control" id="address">-->
+<!--                </div>-->
+
+                <button class="btn btn-primary btn-lg btn-block">
+                   Submit
+                </button> <br>
+                <label class="text-dark"><h3><a href="{{url_for('complaints_page')}}">Have Complaints? Let us know</a> </h3></label>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

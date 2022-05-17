@@ -399,6 +399,26 @@ def order_status():
     return render_template('my_order.html',status=DELIVERY_STATUS)
 
 
+@app.route("/rating",methods=["GET","POST"])
+@login_required
+def rating():
+    global DELIVERY_STATUS
+    if request.method == "POST" :
+        user_provided_rating = float(request.form.get('rating'))
+        restaurant_data = restaurant.query.get(RESTURANT_ID)
+        current_rating = float(restaurant_data.rating)
+        if current_rating:
+            user_provided_rating = (current_rating+user_provided_rating)/2
+        restaurant_data.rating = user_provided_rating
+        db.session.commit()
+        return redirect(url_for("index"))
+
+    if DELIVERY_STATUS == "Delivered" :
+        return render_template('rating.html')
+    flash("Please Wait for the delivery to start rating your order")
+    return redirect(url_for("order_status"))
+
+
 @app.route("/dasher",methods=["GET","POST"])
 def dasher():
     global RESTURANT_ID,USER_ID, DELIVERY_STATUS, delivery_time
